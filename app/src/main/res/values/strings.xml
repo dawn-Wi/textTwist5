@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">textTwist5</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="game_buttonTwist">twist</string>
+    <string name="game_buttonClear">clear</string>
+    <string name="game_buttonEnter">enter</string>
+</resources>

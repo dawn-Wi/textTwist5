@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "812755767293",
+    "project_id": "texttwist5",
+    "storage_bucket": "texttwist5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812755767293:android:81cfaee84d6bd1e8bf5394",
+        "android_client_info": {
+          "package_name": "com.example.texttwist5"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "812755767293-3j69nboahs22qru2ka2g01h3skc61ah1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYKQ0YguOg2cyuKMTVV4Gp0UOt7bTXxzI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "812755767293-3j69nboahs22qru2ka2g01h3skc61ah1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
