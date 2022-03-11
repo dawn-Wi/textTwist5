@@ -142,6 +142,7 @@ public class GameFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Log.d("asdfasdfasdf", "onViewCreated: "+ chosenLetterList);
+                sixLetterWords();
             }
         });
 
@@ -158,7 +159,6 @@ public class GameFragment extends Fragment {
 
             }
         });
-        sixLetterWords();
 
 
     }

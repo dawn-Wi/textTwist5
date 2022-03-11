@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    Map<Integer,Object> user = new HashMap<>();
+//    FirebaseFirestore db = FirebaseFirestore.getInstance();
+//    Map<Integer,Object> user = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
