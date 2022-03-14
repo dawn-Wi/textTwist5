@@ -71,7 +71,7 @@ public class GameViewModel extends ViewModel {
             System.out.println(arrList[i]);
         }
     }
-    
+
 
     public static void shuffle(char[] array, int count) {
         char temp, temp2;
