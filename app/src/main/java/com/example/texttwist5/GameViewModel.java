@@ -14,6 +14,7 @@ public class GameViewModel extends ViewModel {
     private GameRepository gameRepository = GameRepository.getINSTANCE();
     private final MutableLiveData<Boolean> isLoaded = new MutableLiveData<>(false);
     private String randomSelectSixWord;
+    char arrList[] = new char[6];
 
     private List<String> sixWordsList;
     private List<String> allWordsList;
@@ -55,39 +56,42 @@ public class GameViewModel extends ViewModel {
         });
     }
 
-//    public void randomSelectSixWord(){
-//        double randomValue = Math.random();
-//        int ran = (int) (randomValue * sixWordsList.size() - 1);
-//        randomSelectSixWord = sixWordsList.get(ran);
-//        char arr[] = new char[randomSelectSixWord.length()];
-//        for (int i = 0; i < randomSelectSixWord.length(); i++) {
-//            arr[i] = randomSelectSixWord.charAt(i);
-//        }
-//        System.out.println(arr);
-//        shuffle(arr,6);
-//        for (int i = 0; i < randomSelectSixWord.length(); i++) {
-//            System.out.println(arr[i]);
-//        }
-//
-//    }
-//
-//    public static void shuffle(char[] array, int count) {
-//        char temp, temp2;
-//        int randomNum1, randomNum2;
-//
-//        for (int i = 0; i < count; i++) {
-//            randomNum1 = (int) (Math.random() * array.length);
-//            temp = array[randomNum1];
-//            randomNum2 = (int) ((Math.random() * array.length));
-//            temp2 = array[randomNum2];
-//            array[randomNum1] = temp2;
-//            array[randomNum2] = temp;
-//        }
-//    }
+    public void randomSelectSixWord(){
+        double randomValue = Math.random();
+        int ran = (int) (randomValue * sixWordsList.size() - 1);
+        randomSelectSixWord = sixWordsList.get(ran);
+        char arr[] = new char[randomSelectSixWord.length()];
+        for (int i = 0; i < randomSelectSixWord.length(); i++) {
+            arr[i] = randomSelectSixWord.charAt(i);
+        }
+        System.out.println(arr);
+        shuffle(arr,6);
+        for(int i=0;i<arr.length;i++){
+            arrList[i] = arr[i];
+            System.out.println(arrList[i]);
+        }
+    }
+    
+
+    public static void shuffle(char[] array, int count) {
+        char temp, temp2;
+        int randomNum1, randomNum2;
+
+        for (int i = 0; i < count; i++) {
+            randomNum1 = (int) (Math.random() * array.length);
+            temp = array[randomNum1];
+            randomNum2 = (int) ((Math.random() * array.length));
+            temp2 = array[randomNum2];
+            array[randomNum1] = temp2;
+            array[randomNum2] = temp;
+        }
+    }
 
     public List<String> getSixWordsList() {
         return sixWordsList;
     }
+
+    public char[] getRandomShuffleSixWord(){return arrList;}
 
     public LiveData<Boolean> isLoaded() {
         return isLoaded;

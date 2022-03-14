@@ -38,7 +38,6 @@ public class GameFragment extends Fragment {
     Button game_bt_enter;
     ArrayList<String> chosenLetterList = new ArrayList<>();
     List<String> sixWordsList;
-    String randomSelectSixWord;
     char arr[];
 
 
@@ -96,18 +95,8 @@ public class GameFragment extends Fragment {
         gameViewModel.getAllWordsList();
         sixWordsList = gameViewModel.getSixWordsList();
 
-        double randomValue = Math.random();
-        int ran = (int) (randomValue * sixWordsList.size() - 1);
-        String randomSelectSixWord = sixWordsList.get(ran);
-        char arr[] = new char[randomSelectSixWord.length()];
-        for (int i = 0; i < randomSelectSixWord.length(); i++) {
-            arr[i] = randomSelectSixWord.charAt(i);
-        }
-        System.out.println(arr);
-        shuffle(arr,6);
-        for (int i = 0; i < randomSelectSixWord.length(); i++) {
-            System.out.println(arr[i]);
-        }
+        gameViewModel.randomSelectSixWord();
+        arr = gameViewModel.getRandomShuffleSixWord();
 
         String conversionTime = "000200";
         countDown(conversionTime);
@@ -239,20 +228,4 @@ public class GameFragment extends Fragment {
             }
         }.start();
     }
-
-    public static void shuffle(char[] array, int count) {
-        char temp, temp2;
-        int randomNum1, randomNum2;
-
-        for (int i = 0; i < count; i++) {
-            randomNum1 = (int) (Math.random() * array.length);
-            temp = array[randomNum1];
-            randomNum2 = (int) ((Math.random() * array.length));
-            temp2 = array[randomNum2];
-            array[randomNum1] = temp2;
-            array[randomNum2] = temp;
-        }
-    }
-
-
 }
