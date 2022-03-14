@@ -11,17 +11,12 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Scanner;
 
 public class GameFragment extends Fragment {
     GameViewModel gameViewModel;
@@ -32,17 +27,19 @@ public class GameFragment extends Fragment {
     Button alphabet4;
     Button alphabet5;
     Button alphabet6;
-    TextView game_tv_word1;
-    TextView game_tv_word2;
-    TextView game_tv_word3;
-    TextView game_tv_word4;
-    TextView game_tv_word5;
-    TextView game_tv_word6;
+    Button select_bt_alphabet1;
+    Button select_bt_alphabet2;
+    Button select_bt_alphabet3;
+    Button select_bt_alphabet4;
+    Button select_bt_alphabet5;
+    Button select_bt_alphabet6;
     Button game_bt_twist;
     Button game_bt_clear;
     Button game_bt_enter;
-    Random rnd= new Random();
     ArrayList<String> chosenLetterList = new ArrayList<>();
+    List<String> sixWordsList;
+    String randomSelectSixWord;
+    char arr[];
 
 
     public GameFragment() {
@@ -79,82 +76,104 @@ public class GameFragment extends Fragment {
         alphabet4 = view.findViewById(R.id.alphabet4);
         alphabet5 = view.findViewById(R.id.alphabet5);
         alphabet6 = view.findViewById(R.id.alphabet6);
-        game_tv_word1 = view.findViewById(R.id.game_tv_word1);
-        game_tv_word2 = view.findViewById(R.id.game_tv_word2);
-        game_tv_word3 = view.findViewById(R.id.game_tv_word3);
-        game_tv_word4 = view.findViewById(R.id.game_tv_word4);
-        game_tv_word5 = view.findViewById(R.id.game_tv_word5);
-        game_tv_word6 = view.findViewById(R.id.game_tv_word6);
+        select_bt_alphabet1 = view.findViewById(R.id.select_bt_alphabet1);
+        select_bt_alphabet2 = view.findViewById(R.id.select_bt_alphabet2);
+        select_bt_alphabet3 = view.findViewById(R.id.select_bt_alphabet3);
+        select_bt_alphabet4 = view.findViewById(R.id.select_bt_alphabet4);
+        select_bt_alphabet5 = view.findViewById(R.id.select_bt_alphabet5);
+        select_bt_alphabet6 = view.findViewById(R.id.select_bt_alphabet6);
         game_bt_twist = view.findViewById(R.id.game_bt_twist);
         game_bt_clear = view.findViewById(R.id.game_bt_clear);
         game_bt_enter = view.findViewById(R.id.game_bt_enter);
-        try {
-            gameViewModel.setDictionary(requireActivity().getAssets().open("word.txt"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+//        한번만 firestore에 저장하면 되는 코드
+//        try {
+//            gameViewModel.setDictionary(requireActivity().getAssets().open("word.txt"));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        gameViewModel.getAllWordsList();
+        sixWordsList = gameViewModel.getSixWordsList();
+
+        double randomValue = Math.random();
+        int ran = (int) (randomValue * sixWordsList.size() - 1);
+        String randomSelectSixWord = sixWordsList.get(ran);
+        char arr[] = new char[randomSelectSixWord.length()];
+        for (int i = 0; i < randomSelectSixWord.length(); i++) {
+            arr[i] = randomSelectSixWord.charAt(i);
+        }
+        System.out.println(arr);
+        shuffle(arr,6);
+        for (int i = 0; i < randomSelectSixWord.length(); i++) {
+            System.out.println(arr[i]);
+        }
 
         String conversionTime = "000200";
         countDown(conversionTime);
 
-        final String random_name_1 = String.valueOf((char)((int)(rnd.nextInt(26))+97));
-        final String random_name_2 = String.valueOf((char)((int)(rnd.nextInt(26))+97));
-        final String random_name_3 = String.valueOf((char)((int)(rnd.nextInt(26))+97));
-        final String random_name_4 = String.valueOf((char)((int)(rnd.nextInt(26))+97));
-        final String random_name_5 = String.valueOf((char)((int)(rnd.nextInt(26))+97));
-        final String random_name_6 = String.valueOf((char)((int)(rnd.nextInt(26))+97));
-        alphabet1.setText(random_name_1);
-        alphabet2.setText(random_name_2);
-        alphabet3.setText(random_name_3);
-        alphabet4.setText(random_name_4);
-        alphabet5.setText(random_name_5);
-        alphabet6.setText(random_name_6);
+        alphabet1.setText(String.valueOf(arr[0]));
+        alphabet2.setText(String.valueOf(arr[1]));
+        alphabet3.setText(String.valueOf(arr[2]));
+        alphabet4.setText(String.valueOf(arr[3]));
+        alphabet5.setText(String.valueOf(arr[4]));
+        alphabet6.setText(String.valueOf(arr[5]));
+
+        select_bt_alphabet1.setVisibility(View.INVISIBLE);
+        select_bt_alphabet2.setVisibility(View.INVISIBLE);
+        select_bt_alphabet3.setVisibility(View.INVISIBLE);
+        select_bt_alphabet4.setVisibility(View.INVISIBLE);
+        select_bt_alphabet5.setVisibility(View.INVISIBLE);
+        select_bt_alphabet6.setVisibility(View.INVISIBLE);
 
 
         alphabet1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(random_name_1);
-                alphabet1.setEnabled(false);
+                chosenLetterList.add(String.valueOf(arr[0]));
+                alphabet1.setVisibility(View.INVISIBLE);
             }
         });
         alphabet2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(random_name_2);
-
+                chosenLetterList.add(String.valueOf(arr[1]));
+                alphabet2.setVisibility(View.INVISIBLE);
             }
         });
         alphabet3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(random_name_3);
+                chosenLetterList.add(String.valueOf(arr[2]));
+                alphabet3.setVisibility(View.INVISIBLE);
             }
         });
         alphabet4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(random_name_4);
+                chosenLetterList.add(String.valueOf(arr[3]));
+                alphabet4.setVisibility(View.INVISIBLE);
             }
         });
         alphabet5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(random_name_5);
+                chosenLetterList.add(String.valueOf(arr[4]));
+                alphabet5.setVisibility(View.INVISIBLE);
             }
         });
         alphabet6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(random_name_6);
+                chosenLetterList.add(String.valueOf(arr[5]));
+                alphabet6.setVisibility(View.INVISIBLE);
             }
         });
 
         game_bt_enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("asdfasdfasdf", "onViewCreated: "+ chosenLetterList);
+                Log.d("asdfasdfasdf", "onViewCreated: " + chosenLetterList);
             }
         });
 
@@ -220,5 +239,20 @@ public class GameFragment extends Fragment {
             }
         }.start();
     }
+
+    public static void shuffle(char[] array, int count) {
+        char temp, temp2;
+        int randomNum1, randomNum2;
+
+        for (int i = 0; i < count; i++) {
+            randomNum1 = (int) (Math.random() * array.length);
+            temp = array[randomNum1];
+            randomNum2 = (int) ((Math.random() * array.length));
+            temp2 = array[randomNum2];
+            array[randomNum1] = temp2;
+            array[randomNum2] = temp;
+        }
+    }
+
 
 }
