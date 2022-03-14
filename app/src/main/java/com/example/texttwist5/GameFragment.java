@@ -11,13 +11,20 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 public class GameFragment extends Fragment {
+    GameViewModel gameViewModel;
     TextView game_tv_timer;
     Button alphabet1;
     Button alphabet2;
@@ -37,7 +44,6 @@ public class GameFragment extends Fragment {
     Random rnd= new Random();
     ArrayList<String> chosenLetterList = new ArrayList<>();
 
-    private wordDictionary wordDictionary;
 
     public GameFragment() {
         // Required empty public constructor
@@ -53,6 +59,7 @@ public class GameFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        gameViewModel = new ViewModelProvider(requireActivity()).get(GameViewModel.class);
     }
 
     @Override
@@ -81,6 +88,11 @@ public class GameFragment extends Fragment {
         game_bt_twist = view.findViewById(R.id.game_bt_twist);
         game_bt_clear = view.findViewById(R.id.game_bt_clear);
         game_bt_enter = view.findViewById(R.id.game_bt_enter);
+        try {
+            gameViewModel.setDictionary(requireActivity().getAssets().open("word.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         String conversionTime = "000200";
@@ -98,6 +110,7 @@ public class GameFragment extends Fragment {
         alphabet4.setText(random_name_4);
         alphabet5.setText(random_name_5);
         alphabet6.setText(random_name_6);
+
 
         alphabet1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,7 +155,6 @@ public class GameFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Log.d("asdfasdfasdf", "onViewCreated: "+ chosenLetterList);
-                sixLetterWords();
             }
         });
 
@@ -159,7 +171,6 @@ public class GameFragment extends Fragment {
 
             }
         });
-
 
     }
 
@@ -210,9 +221,4 @@ public class GameFragment extends Fragment {
         }.start();
     }
 
-    public void sixLetterWords(){
-        Map<Integer,Object> user = new HashMap<>();
-        user = wordDictionary.getWordMap();
-        Log.d("asd", "sixLetterWords: "+user.containsKey(3));
-    }
 }
