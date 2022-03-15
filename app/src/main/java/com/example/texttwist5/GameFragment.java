@@ -38,7 +38,7 @@ public class GameFragment extends Fragment {
     Button game_bt_enter;
     ArrayList<String> chosenLetterList = new ArrayList<>();
     List<String> sixWordsList;
-    char arr[];
+    char randomSixWordAlphabetArrList[];
 
 
     public GameFragment() {
@@ -92,21 +92,21 @@ public class GameFragment extends Fragment {
 //            e.printStackTrace();
 //        }
 
-        gameViewModel.getAllWordsList();
-        sixWordsList = gameViewModel.getSixWordsList();
+        gameViewModel.getAllWordsList(); //모든 리스트 가져오기
+        sixWordsList = gameViewModel.getSixWordsList(); //6글자단어 리스트 가져오기
 
-        gameViewModel.randomSelectSixWord();
-        arr = gameViewModel.getRandomShuffleSixWord();
+        gameViewModel.randomSelectSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
+        randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
 
         String conversionTime = "000200";
         countDown(conversionTime);
 
-        alphabet1.setText(String.valueOf(arr[0]));
-        alphabet2.setText(String.valueOf(arr[1]));
-        alphabet3.setText(String.valueOf(arr[2]));
-        alphabet4.setText(String.valueOf(arr[3]));
-        alphabet5.setText(String.valueOf(arr[4]));
-        alphabet6.setText(String.valueOf(arr[5]));
+        alphabet1.setText(String.valueOf(randomSixWordAlphabetArrList[0]));
+        alphabet2.setText(String.valueOf(randomSixWordAlphabetArrList[1]));
+        alphabet3.setText(String.valueOf(randomSixWordAlphabetArrList[2]));
+        alphabet4.setText(String.valueOf(randomSixWordAlphabetArrList[3]));
+        alphabet5.setText(String.valueOf(randomSixWordAlphabetArrList[4]));
+        alphabet6.setText(String.valueOf(randomSixWordAlphabetArrList[5]));
 
         select_bt_alphabet1.setVisibility(View.INVISIBLE);
         select_bt_alphabet2.setVisibility(View.INVISIBLE);
@@ -119,42 +119,42 @@ public class GameFragment extends Fragment {
         alphabet1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(String.valueOf(arr[0]));
+                chosenLetterList.add(String.valueOf(randomSixWordAlphabetArrList[0]));
                 alphabet1.setVisibility(View.INVISIBLE);
             }
         });
         alphabet2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(String.valueOf(arr[1]));
+                chosenLetterList.add(String.valueOf(randomSixWordAlphabetArrList[1]));
                 alphabet2.setVisibility(View.INVISIBLE);
             }
         });
         alphabet3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(String.valueOf(arr[2]));
+                chosenLetterList.add(String.valueOf(randomSixWordAlphabetArrList[2]));
                 alphabet3.setVisibility(View.INVISIBLE);
             }
         });
         alphabet4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(String.valueOf(arr[3]));
+                chosenLetterList.add(String.valueOf(randomSixWordAlphabetArrList[3]));
                 alphabet4.setVisibility(View.INVISIBLE);
             }
         });
         alphabet5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(String.valueOf(arr[4]));
+                chosenLetterList.add(String.valueOf(randomSixWordAlphabetArrList[4]));
                 alphabet5.setVisibility(View.INVISIBLE);
             }
         });
         alphabet6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chosenLetterList.add(String.valueOf(arr[5]));
+                chosenLetterList.add(String.valueOf(randomSixWordAlphabetArrList[5]));
                 alphabet6.setVisibility(View.INVISIBLE);
             }
         });

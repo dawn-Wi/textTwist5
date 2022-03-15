@@ -55,8 +55,29 @@ public class FirebaseDataSource {
         }
     }
 
+    public void setSixWordMakeWordList(DataSourceCallback<Result> callback){
+        db.collection("word")
+                .document("dictionary")
+                .get()
+                .addOnCompleteListener(task ->{
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        List<String> allList = (List) document.getData().get("all");
+                        List<String> sixList = (List) document.getData().get("6");
+
+
+                        Log.d("FirebaseDatasource getDictionary", "getDictionary finish");
+                        callback.onComplete(new Result.Success<String>("Success"));
+                    } else {
+                        Log.d("FirebaseDatasource getDictionary", "getDictionary not finish");
+                        callback.onComplete(new Result.Error(new Exception()));
+                    }
+                });
+    }
+
+
+
     public void getDictionary(String type,DataSourceCallback<Result> callback) {
-        List<String> sixWords = new ArrayList<>();
         db.collection("word")
                 .document("dictionary")
                 .get()

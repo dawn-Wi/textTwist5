@@ -14,7 +14,7 @@ public class GameViewModel extends ViewModel {
     private GameRepository gameRepository = GameRepository.getINSTANCE();
     private final MutableLiveData<Boolean> isLoaded = new MutableLiveData<>(false);
     private String randomSelectSixWord;
-    char arrList[] = new char[6];
+    char randomSixWordAlphabetArrList[] = new char[6];
 
     private List<String> sixWordsList;
     private List<String> allWordsList;
@@ -28,6 +28,10 @@ public class GameViewModel extends ViewModel {
                 isLoaded.postValue(false);
             }
         });
+    }
+
+    public void setSixWordMakeWordList(){
+
     }
 
     public List<String> getAllWordsList() {
@@ -67,8 +71,8 @@ public class GameViewModel extends ViewModel {
         System.out.println(arr);
         shuffle(arr,6);
         for(int i=0;i<arr.length;i++){
-            arrList[i] = arr[i];
-            System.out.println(arrList[i]);
+            randomSixWordAlphabetArrList[i] = arr[i];
+            System.out.println(randomSixWordAlphabetArrList[i]);
         }
     }
 
@@ -87,14 +91,10 @@ public class GameViewModel extends ViewModel {
         }
     }
 
-    public List<String> getSixWordsList() {
-        return sixWordsList;
-    }
+    public List<String> getSixWordsList() {return sixWordsList;}
 
-    public char[] getRandomShuffleSixWord(){return arrList;}
+    public char[] getRandomShuffleSixWord(){return randomSixWordAlphabetArrList;}
 
-    public LiveData<Boolean> isLoaded() {
-        return isLoaded;
-    }
+    public LiveData<Boolean> isLoaded() {return isLoaded;}
 
 }
