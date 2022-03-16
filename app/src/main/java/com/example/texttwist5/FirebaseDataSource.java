@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,15 +56,40 @@ public class FirebaseDataSource {
         }
     }
 
-    public void setSixWordMakeWordList(DataSourceCallback<Result> callback){
+    public void setSixWordMakeWordList(DataSourceCallback<Result> callback) {
         db.collection("word")
                 .document("dictionary")
                 .get()
-                .addOnCompleteListener(task ->{
+                .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         List<String> allList = (List) document.getData().get("all");
                         List<String> sixList = (List) document.getData().get("6");
+
+                        for (int i = 0; i < sixList.size(); i++) {
+                            char[] selectSixWordAlphabet = new char[sixList.get(i).length()];
+                            for (int j = 0; j < selectSixWordAlphabet.length; j++) {
+                                selectSixWordAlphabet[j] = sixList.get(i).charAt(j);//6글자 단어 하나에 들어간 알파벳을 배열에 넣기
+                                Arrays.sort(selectSixWordAlphabet); // 오름차순 정렬
+                            }
+                            for (int j = 0; j < allList.size(); j++) {
+                                char[] selectAllWordAlphabet = new char[allList.get(j).length()];
+                                for(int k=0;k<selectAllWordAlphabet.length;k++){
+                                    selectAllWordAlphabet[k] = allList.get(j).charAt(k); //모든글자 단어 처음부터 하나씩 알파벳 배열에 넣기
+                                    Arrays.sort(selectAllWordAlphabet); // 오름차순 정렬
+                                }
+                                for(int m=0;m<selectAllWordAlphabet.length;m++){
+                                    for(int n=0;n<selectSixWordAlphabet.length;n++){
+                                        if(selectSixWordAlphabet[n] == selectAllWordAlphabet[m]){
+
+                                        }
+                                    }
+                                }
+                            }
+                            //두개 배열 비교해서 allword가 sixword안에 다 포함되어 있으면 새로운 list에 추가
+                            //그리고 document이름을 sixword이름으로 해서 list 올려? (여기서 set을 사용하는건가)
+
+                        }
 
 
                         Log.d("FirebaseDatasource getDictionary", "getDictionary finish");
@@ -76,8 +102,7 @@ public class FirebaseDataSource {
     }
 
 
-
-    public void getDictionary(String type,DataSourceCallback<Result> callback) {
+    public void getDictionary(String type, DataSourceCallback<Result> callback) {
         db.collection("word")
                 .document("dictionary")
                 .get()
