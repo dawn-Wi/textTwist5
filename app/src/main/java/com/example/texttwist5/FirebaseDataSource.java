@@ -82,6 +82,7 @@ public class FirebaseDataSource {
 //                                        callback.onComplete(new Result.Success<String>("Success"));
 //                                    }
 //                                });
+//
 //                    }
 //
 //                });
@@ -100,30 +101,45 @@ public class FirebaseDataSource {
                         List<String> sixList = (List) document.getData().get("6");
 
                         List<String> confirmWordsList = new ArrayList<>();
-                        String word = "";
-                        for(int i=0;i<sixList.size();i++){
-                            word= sixList.get(i);
+                        String[] word = new String[sixList.size()];
+                        for (int i = 0; i < sixList.size(); i++) {
+                            word[i] = sixList.get(i);
                             for (int j = 0; j < allList.size(); j++) {
-                                if (isAnswer(word, allList.get(j))) {
+                                if (isAnswer(word[i], allList.get(j))) {
                                     confirmWordsList.add(allList.get(j));
                                 }
                             }
-                            sixWordDictionary.put(word,confirmWordsList);
-                            db.collection("word")
-                                    .document(word)
-                                    .set(sixWordDictionary)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            Log.d("FirebaseDatasource test", "test Success");
-                                            callback.onComplete(new Result.Success<String>("Success"));
-                                        }
-                                    });
+                            sixWordDictionary.put(word[i], confirmWordsList);
                         }
+                        db.collection("word")
+                                .document("sixWordDictionary")
+                                .set(sixWordDictionary)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d("FirebaseDatasource test", "test Success");
+                                        callback.onComplete(new Result.Success<String>("Success"));
+                                    }
+                                });
+//                        for(int i=0;i<sixList.size();i++){
+//                            sixWordDictionary.put(word[i],confirmWordsList);
+//                            db.collection("word")
+//                                    .document(word[i])
+//                                    .set(sixWordDictionary)
+//                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void unused) {
+//                                            Log.d("FirebaseDatasource test", "test Success");
+//                                            callback.onComplete(new Result.Success<String>("Success"));
+//                                        }
+//                                    });
+//                        }
 
                     }
                 });
     }
+
+//
 //                        List<String> confirmWordsList = new ArrayList<>();
 ////
 
