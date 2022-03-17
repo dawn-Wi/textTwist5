@@ -110,17 +110,20 @@ public class FirebaseDataSource {
                                 }
                             }
                             sixWordDictionary.put(word[i], confirmWordsList);
+
+                            db.collection("word")
+                                    .document(word[i])
+                                    .set(sixWordDictionary)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Log.d("FirebaseDatasource test", "test Success");
+                                            callback.onComplete(new Result.Success<String>("Success"));
+                                        }
+                                    });
+                            sixWordDictionary.clear();
                         }
-                        db.collection("word")
-                                .document("sixWordDictionary")
-                                .set(sixWordDictionary)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Log.d("FirebaseDatasource test", "test Success");
-                                        callback.onComplete(new Result.Success<String>("Success"));
-                                    }
-                                });
+
 //                        for(int i=0;i<sixList.size();i++){
 //                            sixWordDictionary.put(word[i],confirmWordsList);
 //                            db.collection("word")
