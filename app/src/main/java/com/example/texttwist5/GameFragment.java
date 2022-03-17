@@ -11,12 +11,10 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class GameFragment extends Fragment {
     GameViewModel gameViewModel;
@@ -91,11 +89,15 @@ public class GameFragment extends Fragment {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+        gameViewModel.setSixWordMakeWordList();
+
+
 
         gameViewModel.getAllWordsList(); //모든 리스트 가져오기
         sixWordsList = gameViewModel.getSixWordsList(); //6글자단어 리스트 가져오기
 
-        gameViewModel.randomSelectSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
+        String selectRandomSixWord = gameViewModel.selectRandomSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
+//        gameViewModel.test(selectRandomSixWord);
         randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
 
         String conversionTime = "000200";

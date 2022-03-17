@@ -30,8 +30,22 @@ public class GameViewModel extends ViewModel {
         });
     }
 
-    public void setSixWordMakeWordList(){
+//    public void test(String word){
+//        gameRepository.test(word,result -> {
+//            if (result.equals("Success")) {
+//                Log.d("gameViewModel finish", "test: success");
+//            }
+//        });
+//    }
 
+    public void setSixWordMakeWordList(){
+        gameRepository.setSixWordMakeWordList(result -> {
+            if(result.equals("Success")){
+                Log.d("gameViewModel setSixWordMakeWordList", "setSixWordMakeWordList: Success");
+            }else{
+                Log.d("gameViewModel setSixWordMakeWordList", "setSixWordMakeWordList: fail");
+            }
+        });
     }
 
     public List<String> getAllWordsList() {
@@ -60,7 +74,7 @@ public class GameViewModel extends ViewModel {
         });
     }
 
-    public void randomSelectSixWord(){
+    public String selectRandomSixWord(){
         double randomValue = Math.random();
         int ran = (int) (randomValue * sixWordsList.size() - 1);
         randomSelectSixWord = sixWordsList.get(ran);
@@ -74,6 +88,7 @@ public class GameViewModel extends ViewModel {
             randomSixWordAlphabetArrList[i] = arr[i];
             System.out.println(randomSixWordAlphabetArrList[i]);
         }
+        return randomSelectSixWord;
     }
 
 

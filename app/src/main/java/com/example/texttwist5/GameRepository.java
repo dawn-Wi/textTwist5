@@ -27,6 +27,22 @@ public class GameRepository {
         });
     }
 
+//    public void test(String word, final FirebaseDataSource.DataSourceCallback<String> callback){
+//        firebaseDataSource.test(word,result -> {
+//            if (result instanceof Result.Success) {
+//                callback.onComplete("Success");
+//            }
+//        });
+//    }
+
+    public void setSixWordMakeWordList(final FirebaseDataSource.DataSourceCallback<String> callback){
+        firebaseDataSource.setSixWordMakeWordList(result -> {
+            if(result instanceof Result.Success){
+                callback.onComplete("Success");
+            }
+        });
+    }
+
     public void loadDictionary(String type, final GameRepositoryCallback<Result> callback) {
         firebaseDataSource.getDictionary(type, result -> {
             if (result instanceof Result.Success) {
