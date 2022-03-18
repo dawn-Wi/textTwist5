@@ -13,8 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class GameFragment extends Fragment {
     GameViewModel gameViewModel;
@@ -37,6 +40,7 @@ public class GameFragment extends Fragment {
     ArrayList<String> chosenLetterList = new ArrayList<>();
     List<String> sixWordsList;
     char randomSixWordAlphabetArrList[];
+    Queue<Button> clickAlphabetButton = new LinkedList<>();
 
 
     public GameFragment() {
@@ -89,15 +93,12 @@ public class GameFragment extends Fragment {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        gameViewModel.setSixWordMakeWordList();
-
-
 
         gameViewModel.getAllWordsList(); //모든 리스트 가져오기
         sixWordsList = gameViewModel.getSixWordsList(); //6글자단어 리스트 가져오기
 
         String selectRandomSixWord = gameViewModel.selectRandomSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
-//        gameViewModel.test(selectRandomSixWord);
+        gameViewModel.checkSixWordMakeList(selectRandomSixWord);
         randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
 
         String conversionTime = "000200";
@@ -123,6 +124,7 @@ public class GameFragment extends Fragment {
             public void onClick(View view) {
                 chosenLetterList.add(String.valueOf(randomSixWordAlphabetArrList[0]));
                 alphabet1.setVisibility(View.INVISIBLE);
+                clickAlphabetButton.add(alphabet1);
             }
         });
         alphabet2.setOnClickListener(new View.OnClickListener() {

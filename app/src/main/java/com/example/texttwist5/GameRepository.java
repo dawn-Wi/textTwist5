@@ -1,9 +1,5 @@
 package com.example.texttwist5;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +30,21 @@ public class GameRepository {
 //            }
 //        });
 //    }
-
-    public void setSixWordMakeWordList(final FirebaseDataSource.DataSourceCallback<String> callback){
-        firebaseDataSource.setSixWordMakeWordList(result -> {
+    public void checkSixWordMakeList(String word,final FirebaseDataSource.DataSourceCallback<String> callback){
+        firebaseDataSource.checkSixWordMakeList(word,result -> {
             if(result instanceof Result.Success){
                 callback.onComplete("Success");
             }
         });
     }
+
+//    public void setSixWordMakeWordList(String word,final FirebaseDataSource.DataSourceCallback<String> callback){
+//        firebaseDataSource.setSixWordMakeWordList(word,result -> {
+//            if(result instanceof Result.Success){
+//                callback.onComplete("Success");
+//            }
+//        });
+//    }
 
     public void loadDictionary(String type, final GameRepositoryCallback<Result> callback) {
         firebaseDataSource.getDictionary(type, result -> {

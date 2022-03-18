@@ -30,20 +30,19 @@ public class GameViewModel extends ViewModel {
         });
     }
 
-//    public void test(String word){
+    //    public void test(String word){
 //        gameRepository.test(word,result -> {
 //            if (result.equals("Success")) {
 //                Log.d("gameViewModel finish", "test: success");
 //            }
 //        });
 //    }
-
-    public void setSixWordMakeWordList(){
-        gameRepository.setSixWordMakeWordList(result -> {
-            if(result.equals("Success")){
-                Log.d("gameViewModel setSixWordMakeWordList", "setSixWordMakeWordList: Success");
-            }else{
-                Log.d("gameViewModel setSixWordMakeWordList", "setSixWordMakeWordList: fail");
+    public void checkSixWordMakeList(String word) {
+        gameRepository.checkSixWordMakeList(word, result -> {
+            if (result.equals("Success")) {
+                Log.d("gameViewModel checkSixWordMakeList", "checkSixWordMakeList: Success");
+            } else {
+                Log.d("gameViewModel checkSixWordMakeList", "checkSixWordMakeList: fail");
             }
         });
     }
@@ -74,7 +73,7 @@ public class GameViewModel extends ViewModel {
         });
     }
 
-    public String selectRandomSixWord(){
+    public String selectRandomSixWord() {
         double randomValue = Math.random();
         int ran = (int) (randomValue * sixWordsList.size() - 1);
         randomSelectSixWord = sixWordsList.get(ran);
@@ -83,8 +82,8 @@ public class GameViewModel extends ViewModel {
             arr[i] = randomSelectSixWord.charAt(i);
         }
         System.out.println(arr);
-        shuffle(arr,6);
-        for(int i=0;i<arr.length;i++){
+        shuffle(arr, 6);
+        for (int i = 0; i < arr.length; i++) {
             randomSixWordAlphabetArrList[i] = arr[i];
             System.out.println(randomSixWordAlphabetArrList[i]);
         }
@@ -106,10 +105,17 @@ public class GameViewModel extends ViewModel {
         }
     }
 
-    public List<String> getSixWordsList() {return sixWordsList;}
 
-    public char[] getRandomShuffleSixWord(){return randomSixWordAlphabetArrList;}
+    public List<String> getSixWordsList() {
+        return sixWordsList;
+    }
 
-    public LiveData<Boolean> isLoaded() {return isLoaded;}
+    public char[] getRandomShuffleSixWord() {
+        return randomSixWordAlphabetArrList;
+    }
+
+    public LiveData<Boolean> isLoaded() {
+        return isLoaded;
+    }
 
 }
