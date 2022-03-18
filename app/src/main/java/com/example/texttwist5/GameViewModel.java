@@ -1,6 +1,5 @@
 package com.example.texttwist5;
 
-import android.os.CountDownTimer;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -8,24 +7,28 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 
 public class GameViewModel extends ViewModel {
     private GameRepository gameRepository = GameRepository.getINSTANCE();
-    private final MutableLiveData<Boolean> isLoaded = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> dictionaryLoaded = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> answerLoaded = new MutableLiveData<>(false);
     private String randomSelectSixWord;
     char randomSixWordAlphabetArrList[] = new char[6];
 
+
     private List<String> sixWordsList;
     private List<String> allWordsList;
+    private HashSet<String> hashSet;
 
     public void setDictionary(InputStream file) {
         gameRepository.setDictionary(file, result -> {
             if (result.equals("Success")) {
-                isLoaded.postValue(true);
+                dictionaryLoaded.postValue(true);
                 Log.d("gameViewModel finish", "setDictionary: success");
             } else {
-                isLoaded.postValue(false);
+                dictionaryLoaded.postValue(false);
             }
         });
     }
@@ -57,7 +60,7 @@ public class GameViewModel extends ViewModel {
             public void onComplete(Result result) {
                 allWordsList = ((Result.Success<List<String>>) result).getData();
                 if (sixWordsList != null) {
-                    isLoaded.setValue(true);
+                    dictionaryLoaded.setValue(true);
                 }
 
             }
@@ -67,7 +70,7 @@ public class GameViewModel extends ViewModel {
             public void onComplete(Result result) {
                 sixWordsList = ((Result.Success<List<String>>) result).getData();
                 if (allWordsList != null) {
-                    isLoaded.setValue(true);
+                    dictionaryLoaded.setValue(true);
                 }
             }
         });
@@ -105,6 +108,19 @@ public class GameViewModel extends ViewModel {
         }
     }
 
+    public void loadAnswers(String word) {
+        gameRepository.loadAnswers(word, new GameRepository.GameRepositoryCallback<Result>() {
+            @Override
+            public void onComplete(Result result) {
+                hashSet = ((Result.Success<HashSet<String>>) result).getData();
+                answerLoaded.setValue(true);
+            }
+        });
+    }
+
+    public boolean checkAnswer(String word){
+        return hashSet.contains(word);
+    }
 
     public List<String> getSixWordsList() {
         return sixWordsList;
@@ -114,8 +130,13 @@ public class GameViewModel extends ViewModel {
         return randomSixWordAlphabetArrList;
     }
 
-    public LiveData<Boolean> isLoaded() {
-        return isLoaded;
+    public LiveData<Boolean> isDictionaryLoaded() {
+        return dictionaryLoaded;
     }
+
+    public LiveData<Boolean> isAnswerLoaded(){
+        return answerLoaded;
+    }
+
 
 }

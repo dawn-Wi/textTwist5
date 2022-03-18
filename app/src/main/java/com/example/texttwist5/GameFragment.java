@@ -11,10 +11,11 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -41,6 +42,8 @@ public class GameFragment extends Fragment {
     List<String> sixWordsList;
     char randomSixWordAlphabetArrList[];
     Queue<Button> clickAlphabetButton = new LinkedList<>();
+    HashSet<String> wordSet = new HashSet<>();
+    String userAnswer;
 
 
     public GameFragment() {
@@ -94,29 +97,35 @@ public class GameFragment extends Fragment {
 //            e.printStackTrace();
 //        }
 
-        gameViewModel.getAllWordsList(); //모든 리스트 가져오기
-        sixWordsList = gameViewModel.getSixWordsList(); //6글자단어 리스트 가져오기
 
         String selectRandomSixWord = gameViewModel.selectRandomSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
-        gameViewModel.checkSixWordMakeList(selectRandomSixWord);
+        gameViewModel.loadAnswers(selectRandomSixWord);
         randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
 
-        String conversionTime = "000200";
-        countDown(conversionTime);
 
-        alphabet1.setText(String.valueOf(randomSixWordAlphabetArrList[0]));
-        alphabet2.setText(String.valueOf(randomSixWordAlphabetArrList[1]));
-        alphabet3.setText(String.valueOf(randomSixWordAlphabetArrList[2]));
-        alphabet4.setText(String.valueOf(randomSixWordAlphabetArrList[3]));
-        alphabet5.setText(String.valueOf(randomSixWordAlphabetArrList[4]));
-        alphabet6.setText(String.valueOf(randomSixWordAlphabetArrList[5]));
+        gameViewModel.isAnswerLoaded().observe(requireActivity(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isLoaded) {
+                if(isLoaded){
+                    String conversionTime = "000200";
+                    countDown(conversionTime);
 
-        select_bt_alphabet1.setVisibility(View.INVISIBLE);
-        select_bt_alphabet2.setVisibility(View.INVISIBLE);
-        select_bt_alphabet3.setVisibility(View.INVISIBLE);
-        select_bt_alphabet4.setVisibility(View.INVISIBLE);
-        select_bt_alphabet5.setVisibility(View.INVISIBLE);
-        select_bt_alphabet6.setVisibility(View.INVISIBLE);
+                    alphabet1.setText(String.valueOf(randomSixWordAlphabetArrList[0]));
+                    alphabet2.setText(String.valueOf(randomSixWordAlphabetArrList[1]));
+                    alphabet3.setText(String.valueOf(randomSixWordAlphabetArrList[2]));
+                    alphabet4.setText(String.valueOf(randomSixWordAlphabetArrList[3]));
+                    alphabet5.setText(String.valueOf(randomSixWordAlphabetArrList[4]));
+                    alphabet6.setText(String.valueOf(randomSixWordAlphabetArrList[5]));
+
+                    select_bt_alphabet1.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet2.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet3.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet4.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet5.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet6.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
 
         alphabet1.setOnClickListener(new View.OnClickListener() {
@@ -167,6 +176,9 @@ public class GameFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Log.d("asdfasdfasdf", "onViewCreated: " + chosenLetterList);
+                for(int i=0;i<chosenLetterList.size();i++){
+                    userAnswer = String.valueOf(chosenLetterList.get(i));
+                }
             }
         });
 

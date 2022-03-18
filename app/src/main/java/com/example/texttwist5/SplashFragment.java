@@ -9,7 +9,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +45,7 @@ public class SplashFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         gameViewModel.loadData();
-        gameViewModel.isLoaded().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        gameViewModel.isDictionaryLoaded().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isLoaded) {
                 if(isLoaded){
