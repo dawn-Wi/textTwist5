@@ -73,6 +73,7 @@ public class GameRepository {
     public void loadAnswers(String word, GameRepositoryCallback<Result> callback) {
         firebaseDataSource.loadAnswers(word, result -> {
             if (result instanceof Result.Success) {
+                //load했는데 answer이 null이면 makeAnswers를 해야해
                 callback.onComplete(result);
             }
         });
