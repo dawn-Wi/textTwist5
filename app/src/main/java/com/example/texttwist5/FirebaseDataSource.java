@@ -26,6 +26,11 @@ public class FirebaseDataSource {
         List<String> wordDataAll = new ArrayList<>();
         List<String> wordData6 = new ArrayList<>();
 
+        List<String> list3 = new ArrayList<>();
+        List<String> list4 = new ArrayList<>();
+        List<String> list5 = new ArrayList<>();
+        List<String> list6 = new ArrayList<>();
+
         Scanner scanner;
 
         scanner = new Scanner(file);
@@ -218,6 +223,28 @@ public class FirebaseDataSource {
                 });
     }
 
+    public void loadSectionAnswers(String word, DataSourceCallback<Result> callback) {
+        db.collection("word")
+                .document(word)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Map<String,List<String>> listMap = new HashMap<>();
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            List<String> list3 = (List<String>) document.getData().get("3");
+                            List<String> list4 = (List<String>) document.getData().get("4");
+                            List<String> list5 = (List<String>) document.getData().get("5");
+                            List<String> list6 = (List<String>) document.getData().get("6");
+                            listMap.put("3",list3);
+                            listMap.put("4",list4);
+                            listMap.put("5",list5);
+                            listMap.put("6",list6);
+                            callback.onComplete(new Result.Success<Map<String, List<String>>>(listMap));
+                        }
+                    }
+                });
+    }
 
     public interface DataSourceCallback<T> {
         void onComplete(T result);

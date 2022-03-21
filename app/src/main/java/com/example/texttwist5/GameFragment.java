@@ -26,7 +26,10 @@ import java.util.Random;
 public class GameFragment extends Fragment {
     GameViewModel gameViewModel;
     TextView game_tv_timer;
-    TextView game_tv_correctAnswers;
+    TextView game_tv_correct3Answers;
+    TextView game_tv_correct4Answers;
+    TextView game_tv_correct5Answers;
+    TextView game_tv_correct6Answers;
     Button alphabet1;
     Button alphabet2;
     Button alphabet3;
@@ -43,7 +46,10 @@ public class GameFragment extends Fragment {
     Button game_bt_clear;
     Button game_bt_enter;
     ArrayList<String> chosenLetterList = new ArrayList<>();
-    ArrayList<String> correctAnswers = new ArrayList<>();
+    ArrayList<String> correct3Answers = new ArrayList<>();
+    ArrayList<String> correct4Answers = new ArrayList<>();
+    ArrayList<String> correct5Answers = new ArrayList<>();
+    ArrayList<String> correct6Answers = new ArrayList<>();
     char randomSixWordAlphabetArrList[];
     Queue<Button> clickAlphabetButton = new LinkedList<>();
 
@@ -76,7 +82,10 @@ public class GameFragment extends Fragment {
     public void onViewCreated(@Nullable View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         game_tv_timer = view.findViewById(R.id.game_tv_timer);
-        game_tv_correctAnswers = view.findViewById(R.id.game_tv_correctAnswers);
+        game_tv_correct3Answers = view.findViewById(R.id.game_tv_correct3Answers);
+        game_tv_correct4Answers = view.findViewById(R.id.game_tv_correct4Answers);
+        game_tv_correct5Answers = view.findViewById(R.id.game_tv_correct5Answers);
+        game_tv_correct6Answers = view.findViewById(R.id.game_tv_correct6Answers);
         alphabet1 = view.findViewById(R.id.alphabet1);
         alphabet2 = view.findViewById(R.id.alphabet2);
         alphabet3 = view.findViewById(R.id.alphabet3);
@@ -195,8 +204,16 @@ public class GameFragment extends Fragment {
                 Log.d("DEBUG", "onClick: " + userAnswer);
                 if (gameViewModel.checkAnswer(userAnswer)) {
                     //값이 맞았을때
-                    correctAnswers.add(userAnswer);
-                    showCorrectAnswers();
+                    if (userAnswer.length() == 3) {
+                        correct3Answers.add(userAnswer);
+                    } else if (userAnswer.length() == 4) {
+                        correct4Answers.add(userAnswer);
+                    } else if (userAnswer.length() == 5) {
+                        correct5Answers.add(userAnswer);
+                    } else if (userAnswer.length() == 6) {
+                        correct6Answers.add(userAnswer);
+                    }
+                    showCorrectAnswers(userAnswer);
                     Log.d("DEBUG", "onClick: OK");
                 } else {
                     //값이 틀렸을때
@@ -323,24 +340,58 @@ public class GameFragment extends Fragment {
             @Override
             public void onFinish() {
                 game_tv_timer.setText("finish");
+                alphabet1.setEnabled(false);
+                alphabet2.setEnabled(false);
+                alphabet3.setEnabled(false);
+                alphabet4.setEnabled(false);
+                alphabet5.setEnabled(false);
+                alphabet6.setEnabled(false);
+                game_bt_twist.setEnabled(false);
+                game_bt_clear.setEnabled(false);
+                game_bt_enter.setEnabled(false);
             }
         }.start();
     }
 
-    private void showCorrectAnswers() {
-        String toShow = "";
-        for (String s : correctAnswers) {
-            toShow += s + "\n";
+    private void showCorrectAnswers(String userAnswer) {
+        switch (userAnswer.length()) {
+            case 3:
+                String to3Show = "";
+                for (String s : correct3Answers) {
+                    to3Show += s + "\n";
+                }
+                game_tv_correct3Answers.setText(to3Show);
+                break;
+            case 4:
+                String to4Show = "";
+                for (String s : correct4Answers) {
+                    to4Show += s + "\n";
+                }
+                game_tv_correct4Answers.setText(to4Show);
+                break;
+            case 5:
+                String to5Show = "";
+                for (String s : correct5Answers) {
+                    to5Show += s + "\n";
+                }
+                game_tv_correct5Answers.setText(to5Show);
+                break;
+            case 6:
+                String to6Show = "";
+                for (String s : correct6Answers) {
+                    to6Show += s + "\n";
+                }
+                game_tv_correct6Answers.setText(to6Show);
+                break;
         }
-        game_tv_correctAnswers.setText(toShow);
     }
 
     public void twist() {
-        gameViewModel.shuffle(randomSixWordAlphabetArrList,6);
+        gameViewModel.shuffle(randomSixWordAlphabetArrList, 6);
         for (int i = 0; i < randomSixWordAlphabetArrList.length; i++) {
             char[] twistArrList = new char[randomSixWordAlphabetArrList.length];
             twistArrList[i] = randomSixWordAlphabetArrList[i];
-            randomSixWordAlphabetArrList[i]=twistArrList[i];
+            randomSixWordAlphabetArrList[i] = twistArrList[i];
             System.out.println(randomSixWordAlphabetArrList[i]);
             alphabet1.setText(String.valueOf(randomSixWordAlphabetArrList[0]));
             alphabet2.setText(String.valueOf(randomSixWordAlphabetArrList[1]));

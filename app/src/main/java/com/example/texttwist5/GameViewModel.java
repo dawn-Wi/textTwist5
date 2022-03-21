@@ -17,7 +17,6 @@ public class GameViewModel extends ViewModel {
     private String randomSelectSixWord;
     char randomSixWordAlphabetArrList[] = new char[6];
 
-
     private List<String> sixWordsList;
     private List<String> allWordsList;
     private HashSet<String> hashSet;

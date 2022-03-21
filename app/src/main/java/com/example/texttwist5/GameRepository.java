@@ -22,7 +22,6 @@ public class GameRepository {
     private FirebaseDataSource firebaseDataSource = new FirebaseDataSource();
     private List<String> sixWordsList;
     private List<String> allWordsList;
-    private HashSet<String> getWordsHashSet;
     private HashSet<String> hashSet;
 
     public void setDictionary(InputStream file, final FirebaseDataSource.DataSourceCallback<String> callback) {
@@ -121,6 +120,9 @@ public class GameRepository {
             }
         });
     }
+
+
+
 
     public void setDataSource(FirebaseDataSource ds) {
         this.firebaseDataSource = ds;

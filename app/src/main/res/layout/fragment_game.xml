@@ -220,14 +220,59 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/game_tv_correctAnswers"
+        android:id="@+id/game_tv_correct3Answers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text=""
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/select_bt_alphabet3"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/game_tv_timer"
+        app:layout_constraintVertical_bias="0.4"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/game_tv_correct4Answers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/select_bt_alphabet3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/game_tv_timer"
+        app:layout_constraintVertical_bias="0.4"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/game_tv_correct5Answers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/select_bt_alphabet3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/game_tv_timer"
+        app:layout_constraintVertical_bias="0.4"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/game_tv_correct6Answers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/select_bt_alphabet3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/game_tv_timer"
+        app:layout_constraintVertical_bias="0.4"
         tools:ignore="MissingConstraints" />
 
 
