@@ -94,7 +94,7 @@ public class GameViewModel extends ViewModel {
     }
 
 
-    public static void shuffle(char[] array, int count) {
+    public void shuffle(char[] array, int count) {
         char temp, temp2;
         int randomNum1, randomNum2;
 

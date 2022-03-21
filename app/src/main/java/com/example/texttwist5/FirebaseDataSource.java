@@ -211,7 +211,7 @@ public class FirebaseDataSource {
                             }
                             callback.onComplete(new Result.Success<HashSet<String>>(wordSet));
                         }else{
-                            callback.onComplete(new Result.Success<HashSet<String>>(wordSet));
+                            callback.onComplete(new Result.Error(new Exception()));
                         }
 
                     }

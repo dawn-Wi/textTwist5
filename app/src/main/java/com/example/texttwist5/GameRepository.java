@@ -52,43 +52,37 @@ public class GameRepository {
     public void loadDictionary(String type, final GameRepositoryCallback<Result> callback) {
         firebaseDataSource.getDictionary(type, result -> {
             if (result instanceof Result.Success) {
-                allWordsList = ((Result.Success<List<String>>)result).getData();
-                callback.onComplete(result);
+                if(type.equals("all")){
+                    allWordsList = ((Result.Success<List<String>>)result).getData();
+                    callback.onComplete(result);
+                }
+                else if(type.equals("6")){
+                    sixWordsList = ((Result.Success<List<String>>)result).getData();
+                    callback.onComplete(result);
+                }
             }
         });
     }
-
-    public List<String> getAllWordsList() {
-        if (allWordsList == null) {
-            allWordsList = new ArrayList<>();
-            loadDictionary("all", new GameRepositoryCallback<Result>() {
-                @Override
-                public void onComplete(Result result) {
-                    allWordsList = ((Result.Success<List<String>>) result).getData();
-                }
-            });
-        }
-        return allWordsList;
-    }
-
 
     public void loadAnswers(String word, GameRepositoryCallback<Result> callback) {
         firebaseDataSource.loadAnswers(word, result -> {
             if (result instanceof Result.Success) {
                 //load했는데 answer이 null이면 makeAnswers를 해야해
                 hashSet = ((Result.Success<HashSet<String>>) result).getData();
-                if(hashSet.size()==0){
-                    callback.onComplete(new Result.Success(makeAnswers(word)));
-
-                }
                 callback.onComplete(result);
+//                if(hashSet.size()==0){
+//                    callback.onComplete(new Result.Success(makeAnswers(word)));
+//                }
+            }else {
+                callback.onComplete(new Result.Success(makeAnswers(word)));
             }
         });
     }
 
 
-    private Map<String, List<String>> makeAnswers(String word) {
+    private HashSet<String> makeAnswers(String word) {
         Map<String, List<String>> answerMap = new HashMap<>();
+        HashSet<String> wordSet = new HashSet<>();
         List<String> allList = allWordsList;
         List<String> confirmWordsList3 = new ArrayList<>();
         List<String> confirmWordsList4 = new ArrayList<>();
@@ -98,12 +92,16 @@ public class GameRepository {
             if (AnswerChecker.isAnswer(word, allList.get(i))) {
                 if (allList.get(i).length() == 3) {
                     confirmWordsList3.add(allList.get(i));
+                    wordSet.add(allList.get(i));
                 } else if (allList.get(i).length() == 4) {
                     confirmWordsList4.add(allList.get(i));
+                    wordSet.add(allList.get(i));
                 } else if (allList.get(i).length() == 5) {
                     confirmWordsList5.add(allList.get(i));
+                    wordSet.add(allList.get(i));
                 } else if (allList.get(i).length() == 6) {
                     confirmWordsList6.add(allList.get(i));
+                    wordSet.add(allList.get(i));
                 }
             }
         }
@@ -112,7 +110,7 @@ public class GameRepository {
         answerMap.put("5", confirmWordsList5);
         answerMap.put("6", confirmWordsList6);
         saveAnswers(answerMap,word);
-        return answerMap;
+        return wordSet;
     }
 
     public void saveAnswers(Map<String, List<String>> answerMap, String word){
