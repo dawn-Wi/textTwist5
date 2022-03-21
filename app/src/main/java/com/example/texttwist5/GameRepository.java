@@ -23,6 +23,7 @@ public class GameRepository {
     private List<String> sixWordsList;
     private List<String> allWordsList;
     private HashSet<String> getWordsHashSet;
+    private HashSet<String> hashSet;
 
     public void setDictionary(InputStream file, final FirebaseDataSource.DataSourceCallback<String> callback) {
         firebaseDataSource.setDictionary(file, result -> {
@@ -51,6 +52,7 @@ public class GameRepository {
     public void loadDictionary(String type, final GameRepositoryCallback<Result> callback) {
         firebaseDataSource.getDictionary(type, result -> {
             if (result instanceof Result.Success) {
+                allWordsList = ((Result.Success<List<String>>)result).getData();
                 callback.onComplete(result);
             }
         });
@@ -74,14 +76,19 @@ public class GameRepository {
         firebaseDataSource.loadAnswers(word, result -> {
             if (result instanceof Result.Success) {
                 //load했는데 answer이 null이면 makeAnswers를 해야해
+                hashSet = ((Result.Success<HashSet<String>>) result).getData();
+                if(hashSet.size()==0){
+                    callback.onComplete(new Result.Success(makeAnswers(word)));
+
+                }
                 callback.onComplete(result);
             }
         });
     }
 
-    private void makeAnswers(String word, FirebaseDataSource.DataSourceCallback<Result> callback) {
-        Map<String, List<String>> answerMap = new HashMap<>();
 
+    private Map<String, List<String>> makeAnswers(String word) {
+        Map<String, List<String>> answerMap = new HashMap<>();
         List<String> allList = allWordsList;
         List<String> confirmWordsList3 = new ArrayList<>();
         List<String> confirmWordsList4 = new ArrayList<>();
@@ -105,7 +112,7 @@ public class GameRepository {
         answerMap.put("5", confirmWordsList5);
         answerMap.put("6", confirmWordsList6);
         saveAnswers(answerMap,word);
-
+        return answerMap;
     }
 
     public void saveAnswers(Map<String, List<String>> answerMap, String word){

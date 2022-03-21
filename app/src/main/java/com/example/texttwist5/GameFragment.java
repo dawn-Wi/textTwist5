@@ -103,7 +103,7 @@ public class GameFragment extends Fragment {
         randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
 
 
-        gameViewModel.isAnswerLoaded().observe(requireActivity(), new Observer<Boolean>() {
+        gameViewModel.isAnswerLoaded().observe(requireActivity(), new Observer<Boolean>() { //로딩되면
             @Override
             public void onChanged(Boolean isLoaded) {
                 if(isLoaded){
