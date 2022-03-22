@@ -16,12 +16,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameFragment extends Fragment {
     GameViewModel gameViewModel;
@@ -51,7 +47,9 @@ public class GameFragment extends Fragment {
     ArrayList<String> correct5Answers = new ArrayList<>();
     ArrayList<String> correct6Answers = new ArrayList<>();
     char randomSixWordAlphabetArrList[];
-    Queue<Button> clickAlphabetButton = new LinkedList<>();
+    Map<String, Integer> newCountList = new HashMap<>();
+    Map<String,Integer> correctAnswerCountMap = new HashMap<>();
+
 
 
     public GameFragment() {
@@ -113,6 +111,7 @@ public class GameFragment extends Fragment {
         String selectRandomSixWord = gameViewModel.selectRandomSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
         gameViewModel.loadAnswers(selectRandomSixWord);
         randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
+        gameViewModel.loadCountSectionAnswers(selectRandomSixWord); // 3단어,4단어,5단어,6단어 갯수 map만들기
 
 
         gameViewModel.isAnswerLoaded().observe(requireActivity(), new Observer<Boolean>() { //로딩되면
@@ -202,18 +201,24 @@ public class GameFragment extends Fragment {
                     userAnswer += chosenLetter;
                 }
                 Log.d("DEBUG", "onClick: " + userAnswer);
+
+
                 if (gameViewModel.checkAnswer(userAnswer)) {
                     //값이 맞았을때
                     if (userAnswer.length() == 3) {
                         correct3Answers.add(userAnswer);
+                        correctAnswerCountMap.put("3",newCountList.get("3")-1);
                     } else if (userAnswer.length() == 4) {
                         correct4Answers.add(userAnswer);
+                        correctAnswerCountMap.put("4",newCountList.get("4")-1);
                     } else if (userAnswer.length() == 5) {
                         correct5Answers.add(userAnswer);
+                        correctAnswerCountMap.put("5",newCountList.get("5")-1);
                     } else if (userAnswer.length() == 6) {
                         correct6Answers.add(userAnswer);
+                        correctAnswerCountMap.put("6",newCountList.get("6")-1);
                     }
-                    showCorrectAnswers(userAnswer);
+//                    showCorrectAnswers(userAnswer);
                     Log.d("DEBUG", "onClick: OK");
                 } else {
                     //값이 틀렸을때
@@ -234,6 +239,19 @@ public class GameFragment extends Fragment {
                 select_bt_alphabet6.setVisibility(View.INVISIBLE);
                 chosenLetterList.clear();
                 game_bt_twist.setEnabled(true);
+
+                String finalUserAnswer = userAnswer;
+                gameViewModel.isCountListLoaded().observe(requireActivity(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean isLoaded) {
+                        if(isLoaded){
+                            newCountList = gameViewModel.countAnswersNumber(finalUserAnswer);
+                            showCorrectAnswers(finalUserAnswer);
+                        }
+                    }
+                });
+
+
             }
         });
 
@@ -360,28 +378,28 @@ public class GameFragment extends Fragment {
                 for (String s : correct3Answers) {
                     to3Show += s + "\n";
                 }
-                game_tv_correct3Answers.setText(to3Show);
+                game_tv_correct3Answers.setText("\n"+to3Show);
                 break;
             case 4:
                 String to4Show = "";
                 for (String s : correct4Answers) {
                     to4Show += s + "\n";
                 }
-                game_tv_correct4Answers.setText(to4Show);
+                game_tv_correct4Answers.setText("\n"+to4Show);
                 break;
             case 5:
                 String to5Show = "";
                 for (String s : correct5Answers) {
                     to5Show += s + "\n";
                 }
-                game_tv_correct5Answers.setText(to5Show);
+                game_tv_correct5Answers.setText("\n"+to5Show);
                 break;
             case 6:
                 String to6Show = "";
                 for (String s : correct6Answers) {
                     to6Show += s + "\n";
                 }
-                game_tv_correct6Answers.setText(to6Show);
+                game_tv_correct6Answers.setText("\n"+to6Show);
                 break;
         }
     }

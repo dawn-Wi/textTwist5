@@ -2,9 +2,6 @@ package com.example.texttwist5;
 
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +20,7 @@ public class GameRepository {
     private List<String> sixWordsList;
     private List<String> allWordsList;
     private HashSet<String> hashSet;
+    private Map<String,Integer> countMap;
 
     public void setDictionary(InputStream file, final FirebaseDataSource.DataSourceCallback<String> callback) {
         firebaseDataSource.setDictionary(file, result -> {
@@ -117,6 +115,15 @@ public class GameRepository {
             @Override
             public void onComplete(Result result) {
                 Log.d("repository saveAnswers", "onComplete: Success");
+            }
+        });
+    }
+
+    public void loadCountSectionAnswers(String word, GameRepositoryCallback<Result> callback){
+        firebaseDataSource.loadCountSectionAnswers(word, result -> {
+            if(result instanceof Result.Success){
+                countMap=((Result.Success<Map<String, Integer>>)result).getData();
+                callback.onComplete(result);
             }
         });
     }

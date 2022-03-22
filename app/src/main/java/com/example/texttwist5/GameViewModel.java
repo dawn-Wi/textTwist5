@@ -7,19 +7,23 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class GameViewModel extends ViewModel {
     private GameRepository gameRepository = GameRepository.getINSTANCE();
     private final MutableLiveData<Boolean> dictionaryLoaded = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> answerLoaded = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> countListLoaded = new MutableLiveData<>(false);
     private String randomSelectSixWord;
     char randomSixWordAlphabetArrList[] = new char[6];
 
     private List<String> sixWordsList;
     private List<String> allWordsList;
     private HashSet<String> hashSet;
+    private Map<String,Integer> wordSizeList;
 
     public void setDictionary(InputStream file) {
         gameRepository.setDictionary(file, result -> {
@@ -117,6 +121,41 @@ public class GameViewModel extends ViewModel {
         });
     }
 
+    public void loadCountSectionAnswers(String word){
+        gameRepository.loadCountSectionAnswers(word, new GameRepository.GameRepositoryCallback<Result>() {
+            @Override
+            public void onComplete(Result result) {
+                wordSizeList = ((Result.Success<Map<String, Integer>>)result).getData();
+                countListLoaded.setValue(true);
+            }
+        });
+    }
+
+    public Map<String, Integer> countAnswersNumber(String userAnswer){
+        int word3Value = wordSizeList.get("3");
+        int word4Value=wordSizeList.get("4");
+        int word5Value=wordSizeList.get("5");
+        int word6Value=wordSizeList.get("6");
+        Map<String,Integer> countList = new HashMap<>();
+        if(userAnswer.length()==3){
+            word3Value = wordSizeList.get("3");
+        }
+        else if(userAnswer.length()==4){
+            word4Value = wordSizeList.get("4");
+        }
+        else if(userAnswer.length()==5){
+            word4Value = wordSizeList.get("5");
+        }
+        else if(userAnswer.length()==6){
+            word4Value = wordSizeList.get("6");
+        }
+        countList.put("3",word3Value);
+        countList.put("4",word4Value);
+        countList.put("5",word5Value);
+        countList.put("6",word6Value);
+        return countList;
+    }
+
     public boolean checkAnswer(String word){
         return hashSet.contains(word);
     }
@@ -135,6 +174,10 @@ public class GameViewModel extends ViewModel {
 
     public LiveData<Boolean> isAnswerLoaded(){
         return answerLoaded;
+    }
+
+    public LiveData<Boolean> isCountListLoaded(){
+        return countListLoaded;
     }
 
 

@@ -223,24 +223,24 @@ public class FirebaseDataSource {
                 });
     }
 
-    public void loadSectionAnswers(String word, DataSourceCallback<Result> callback) {
+    public void loadCountSectionAnswers(String word, DataSourceCallback<Result> callback) {
         db.collection("word")
                 .document(word)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Map<String,List<String>> listMap = new HashMap<>();
+                        Map<String,Integer> listMap = new HashMap<>();
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             List<String> list3 = (List<String>) document.getData().get("3");
                             List<String> list4 = (List<String>) document.getData().get("4");
                             List<String> list5 = (List<String>) document.getData().get("5");
                             List<String> list6 = (List<String>) document.getData().get("6");
-                            listMap.put("3",list3);
-                            listMap.put("4",list4);
-                            listMap.put("5",list5);
-                            listMap.put("6",list6);
-                            callback.onComplete(new Result.Success<Map<String, List<String>>>(listMap));
+                            listMap.put("3",list3.size());
+                            listMap.put("4",list4.size());
+                            listMap.put("5",list5.size());
+                            listMap.put("6",list6.size());
+                            callback.onComplete(new Result.Success<Map<String, Integer>>(listMap));
                         }
                     }
                 });
