@@ -19,8 +19,7 @@ public class GameRepository {
     private FirebaseDataSource firebaseDataSource = new FirebaseDataSource();
     private List<String> sixWordsList;
     private List<String> allWordsList;
-    private HashSet<String> hashSet;
-    private Map<String,Integer> countMap;
+    private Map<String, List<String>> answerMap;
 
     public void setDictionary(InputStream file, final FirebaseDataSource.DataSourceCallback<String> callback) {
         firebaseDataSource.setDictionary(file, result -> {
@@ -65,7 +64,7 @@ public class GameRepository {
         firebaseDataSource.loadAnswers(word, result -> {
             if (result instanceof Result.Success) {
                 //load했는데 answer이 null이면 makeAnswers를 해야해
-                hashSet = ((Result.Success<HashSet<String>>) result).getData();
+                answerMap = ((Result.Success<Map>) result).getData();
                 callback.onComplete(result);
 //                if(hashSet.size()==0){
 //                    callback.onComplete(new Result.Success(makeAnswers(word)));
@@ -77,9 +76,8 @@ public class GameRepository {
     }
 
 
-    private HashSet<String> makeAnswers(String word) {
+    private Map<String, List<String>> makeAnswers(String word) {
         Map<String, List<String>> answerMap = new HashMap<>();
-        HashSet<String> wordSet = new HashSet<>();
         List<String> allList = allWordsList;
         List<String> confirmWordsList3 = new ArrayList<>();
         List<String> confirmWordsList4 = new ArrayList<>();
@@ -89,16 +87,12 @@ public class GameRepository {
             if (AnswerChecker.isAnswer(word, allList.get(i))) {
                 if (allList.get(i).length() == 3) {
                     confirmWordsList3.add(allList.get(i));
-                    wordSet.add(allList.get(i));
                 } else if (allList.get(i).length() == 4) {
                     confirmWordsList4.add(allList.get(i));
-                    wordSet.add(allList.get(i));
                 } else if (allList.get(i).length() == 5) {
                     confirmWordsList5.add(allList.get(i));
-                    wordSet.add(allList.get(i));
                 } else if (allList.get(i).length() == 6) {
                     confirmWordsList6.add(allList.get(i));
-                    wordSet.add(allList.get(i));
                 }
             }
         }
@@ -107,7 +101,7 @@ public class GameRepository {
         answerMap.put("5", confirmWordsList5);
         answerMap.put("6", confirmWordsList6);
         saveAnswers(answerMap,word);
-        return wordSet;
+        return answerMap;
     }
 
     public void saveAnswers(Map<String, List<String>> answerMap, String word){
@@ -118,18 +112,6 @@ public class GameRepository {
             }
         });
     }
-
-    public void loadCountSectionAnswers(String word, GameRepositoryCallback<Result> callback){
-        firebaseDataSource.loadCountSectionAnswers(word, result -> {
-            if(result instanceof Result.Success){
-                countMap=((Result.Success<Map<String, Integer>>)result).getData();
-                callback.onComplete(result);
-            }
-        });
-    }
-
-
-
 
     public void setDataSource(FirebaseDataSource ds) {
         this.firebaseDataSource = ds;

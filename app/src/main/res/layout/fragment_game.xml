@@ -285,5 +285,14 @@
         app:layout_constraintTop_toBottomOf="@+id/game_bt_clear"
         tools:ignore="MissingConstraints" />
 
+    <Button
+        android:id="@+id/game_bt_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pause"
+        app:layout_constraintEnd_toEndOf="@+id/game_bt_retry"
+        app:layout_constraintStart_toStartOf="@+id/game_bt_retry"
+        app:layout_constraintTop_toBottomOf="@+id/game_bt_retry" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

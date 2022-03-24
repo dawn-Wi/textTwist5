@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameFragment extends Fragment {
@@ -42,17 +43,9 @@ public class GameFragment extends Fragment {
     Button game_bt_clear;
     Button game_bt_enter;
     Button game_bt_retry;
+    Button game_bt_pause;
     ArrayList<String> chosenLetterList = new ArrayList<>();
-    ArrayList<String> correct3Answers = new ArrayList<>();
-    ArrayList<String> correct4Answers = new ArrayList<>();
-    ArrayList<String> correct5Answers = new ArrayList<>();
-    ArrayList<String> correct6Answers = new ArrayList<>();
-    char randomSixWordAlphabetArrList[];
-    Map<String, Integer> newCountList = new HashMap<>();
-    Map<String, Integer> maxCountList = new HashMap<>();
-
-
-
+    char[] randomSixWordAlphabetArrList;
 
     public GameFragment() {
         // Required empty public constructor
@@ -81,6 +74,7 @@ public class GameFragment extends Fragment {
     @Override
     public void onViewCreated(@Nullable View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //region findViewById
         game_tv_timer = view.findViewById(R.id.game_tv_timer);
         game_tv_correct3Answers = view.findViewById(R.id.game_tv_correct3Answers);
         game_tv_correct4Answers = view.findViewById(R.id.game_tv_correct4Answers);
@@ -102,66 +96,21 @@ public class GameFragment extends Fragment {
         game_bt_clear = view.findViewById(R.id.game_bt_clear);
         game_bt_enter = view.findViewById(R.id.game_bt_enter);
         game_bt_retry = view.findViewById(R.id.game_bt_retry);
+        game_bt_pause = view.findViewById(R.id.game_bt_pause);
+        //endregion
 
-//        한번만 firestore에 저장하면 되는 코드
-//        try {
-//            gameViewModel.setDictionary(requireActivity().getAssets().open("word.txt"));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        gameViewModel.newGame();
 
-
-        String selectRandomSixWord = gameViewModel.selectRandomSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
-        gameViewModel.loadAnswers(selectRandomSixWord); //답지가져오기&없으면 만들기
-        randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
-
-
-
-        gameViewModel.isAnswerLoaded().observe(requireActivity(), new Observer<Boolean>() { //로딩되면
+        //region OnClickListeners
+        game_bt_pause.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChanged(Boolean isLoaded) {
-                if (isLoaded) {
-                    String conversionTime = "000200";
-                    countDown(conversionTime);
-
-                    gameViewModel.loadCountSectionAnswers(selectRandomSixWord); // 3단어,4단어,5단어,6단어 갯수 map만들기
-                    gameViewModel.isCountListLoaded().observe(requireActivity(), new Observer<Boolean>() {
-                        @Override
-                        public void onChanged(Boolean isLoaded) {
-                            if(isLoaded){
-                                newCountList = gameViewModel.countAnswersNumber(selectRandomSixWord);
-                                maxCountList = gameViewModel.countAnswersNumber(selectRandomSixWord);
-
-                                game_tv_correct3Answers.setText(maxCountList.get("3")+"/"+maxCountList.get("3"));
-                                game_tv_correct4Answers.setText(maxCountList.get("4")+"/"+maxCountList.get("4"));
-                                game_tv_correct5Answers.setText(maxCountList.get("5")+"/"+maxCountList.get("5"));
-                                game_tv_correct6Answers.setText(maxCountList.get("6")+"/"+maxCountList.get("6"));
-
-                                Log.d("ASdfasdfasdf", "onChanged: "+newCountList);
-//                            showCorrectAnswers(finalUserAnswer);
-                            }
-                        }
-                    });
-
-
-                    alphabet1.setText(String.valueOf(randomSixWordAlphabetArrList[0]));
-                    alphabet2.setText(String.valueOf(randomSixWordAlphabetArrList[1]));
-                    alphabet3.setText(String.valueOf(randomSixWordAlphabetArrList[2]));
-                    alphabet4.setText(String.valueOf(randomSixWordAlphabetArrList[3]));
-                    alphabet5.setText(String.valueOf(randomSixWordAlphabetArrList[4]));
-                    alphabet6.setText(String.valueOf(randomSixWordAlphabetArrList[5]));
-
-                    select_bt_alphabet1.setVisibility(View.INVISIBLE);
-                    select_bt_alphabet2.setVisibility(View.INVISIBLE);
-                    select_bt_alphabet3.setVisibility(View.INVISIBLE);
-                    select_bt_alphabet4.setVisibility(View.INVISIBLE);
-                    select_bt_alphabet5.setVisibility(View.INVISIBLE);
-                    select_bt_alphabet6.setVisibility(View.INVISIBLE);
-
-                }
+            public void onClick(View view) {
+                if (gameViewModel.getGameState().getValue() == GameViewModel.GameState.PAUSED)
+                    gameViewModel.resume();
+                else
+                    gameViewModel.pause();
             }
         });
-
         alphabet1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -224,63 +173,11 @@ public class GameFragment extends Fragment {
                 for (String chosenLetter : chosenLetterList) {
                     userAnswer += chosenLetter;
                 }
+                gameViewModel.checkAnswer(userAnswer);
                 Log.d("DEBUG", "onClick: " + userAnswer);
 
-//                String finalUserAnswer = userAnswer;
-//                gameViewModel.isCountListLoaded().observe(requireActivity(), new Observer<Boolean>() {
-//                    @Override
-//                    public void onChanged(Boolean isLoaded) {
-//                        if(isLoaded){
-//                            newCountList = gameViewModel.countAnswersNumber(finalUserAnswer);
-//                            Log.d("ASdfasdfasdf", "onChanged: "+newCountList);
-////                            showCorrectAnswers(finalUserAnswer);
-//                        }
-//                    }
-//                });
-
-
-                if (gameViewModel.checkAnswer(userAnswer)) {
-                    //값이 맞았을때
-                    if (userAnswer.length() == 3) {
-                        correct3Answers.add(userAnswer);
-                        newCountList.put("3",newCountList.get("3")-1);
-//                        minusValue(userAnswer);
-                    } else if (userAnswer.length() == 4) {
-                        correct4Answers.add(userAnswer);
-                        newCountList.put("4",newCountList.get("4")-1);
-//                        minusValue(userAnswer);
-//                        correctAnswerCountMap.put("4",newCountList.get("4")-1);
-                    } else if (userAnswer.length() == 5) {
-                        correct5Answers.add(userAnswer);
-                        newCountList.put("5",newCountList.get("5")-1);
-//                        minusValue(userAnswer);
-//                        correctAnswerCountMap.put("5",newCountList.get("5")-1);
-                    } else if (userAnswer.length() == 6) {
-                        correct6Answers.add(userAnswer);
-                        newCountList.put("6",newCountList.get("6")-1);
-//                        minusValue(userAnswer);
-//                        correctAnswerCountMap.put("6",newCountList.get("6")-1);
-                    }
-                    showCorrectAnswers(userAnswer);
-                    Log.d("DEBUG", "onClick: OK");
-                } else {
-                    //값이 틀렸을때
-                    Toast.makeText(getContext(), "없어바보야", Toast.LENGTH_SHORT).show();
-                    Log.d("DEBUG", "onClick: NOT OK");
-                }
-
-                alphabet1.setVisibility(View.VISIBLE);
-                alphabet2.setVisibility(View.VISIBLE);
-                alphabet3.setVisibility(View.VISIBLE);
-                alphabet4.setVisibility(View.VISIBLE);
-                alphabet5.setVisibility(View.VISIBLE);
-                alphabet6.setVisibility(View.VISIBLE);
-                select_bt_alphabet1.setVisibility(View.INVISIBLE);
-                select_bt_alphabet2.setVisibility(View.INVISIBLE);
-                select_bt_alphabet3.setVisibility(View.INVISIBLE);
-                select_bt_alphabet4.setVisibility(View.INVISIBLE);
-                select_bt_alphabet5.setVisibility(View.INVISIBLE);
-                select_bt_alphabet6.setVisibility(View.INVISIBLE);
+                showAlphabetButtons();
+                hideSelectedAlphabetButtons();
                 chosenLetterList.clear();
                 game_bt_twist.setEnabled(true);
 
@@ -290,18 +187,8 @@ public class GameFragment extends Fragment {
         game_bt_clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                alphabet1.setVisibility(View.VISIBLE);
-                alphabet2.setVisibility(View.VISIBLE);
-                alphabet3.setVisibility(View.VISIBLE);
-                alphabet4.setVisibility(View.VISIBLE);
-                alphabet5.setVisibility(View.VISIBLE);
-                alphabet6.setVisibility(View.VISIBLE);
-                select_bt_alphabet1.setVisibility(View.INVISIBLE);
-                select_bt_alphabet2.setVisibility(View.INVISIBLE);
-                select_bt_alphabet3.setVisibility(View.INVISIBLE);
-                select_bt_alphabet4.setVisibility(View.INVISIBLE);
-                select_bt_alphabet5.setVisibility(View.INVISIBLE);
-                select_bt_alphabet6.setVisibility(View.INVISIBLE);
+                hideSelectedAlphabetButtons();
+                showAlphabetButtons();
                 chosenLetterList.clear();
                 game_bt_twist.setEnabled(true);
             }
@@ -317,17 +204,107 @@ public class GameFragment extends Fragment {
         game_bt_retry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                gameViewModel.newGame();
+            }
+        });
+        //endregion
 
-                String selectRandomSixWord = gameViewModel.selectRandomSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
-                gameViewModel.loadAnswers(selectRandomSixWord); //답지가져오기&없으면 만들기
-                randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
-                countDown("000000");
+        gameViewModel.isIncorrectAnswerSubmitted().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isIncorrectAnswer) {
+                if (isIncorrectAnswer)
+                    Toast.makeText(getContext(), "바보", Toast.LENGTH_SHORT).show();
             }
         });
 
+        gameViewModel.getWordsRemainingText3().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                StringBuilder sb = new StringBuilder(s);
+                List<String> correctAnswersList = gameViewModel.getCorrect3Answers();
+                for (String str : correctAnswersList) {
+                    sb.append("\n" + str);
+                }
+                game_tv_correct3Answers.setText(sb.toString());
+            }
+        });
+
+        gameViewModel.getWordsRemainingText4().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                StringBuilder sb = new StringBuilder(s);
+                List<String> correctAnswersList = gameViewModel.getCorrect4Answers();
+                for (String str : correctAnswersList) {
+                    sb.append("\n" + str);
+                }
+                game_tv_correct4Answers.setText(sb.toString());
+            }
+        });
+
+        gameViewModel.getWordsRemainingText5().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                StringBuilder sb = new StringBuilder(s);
+                List<String> correctAnswersList = gameViewModel.getCorrect5Answers();
+                for (String str : correctAnswersList) {
+                    sb.append("\n" + str);
+                }
+                game_tv_correct5Answers.setText(sb.toString());
+            }
+        });
+
+        gameViewModel.getWordsRemainingText6().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                StringBuilder sb = new StringBuilder(s);
+                List<String> correctAnswersList = gameViewModel.getCorrect6Answers();
+                for (String str : correctAnswersList) {
+                    sb.append("\n" + str);
+                }
+                game_tv_correct6Answers.setText(sb.toString());
+            }
+        });
+
+        gameViewModel.getTimerText().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                game_tv_timer.setText(s);
+            }
+        });
+
+        gameViewModel.getCurrDisplayedText().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                randomSixWordAlphabetArrList = s.toCharArray();
+                alphabet1.setText(String.valueOf(randomSixWordAlphabetArrList[0]));
+                alphabet2.setText(String.valueOf(randomSixWordAlphabetArrList[1]));
+                alphabet3.setText(String.valueOf(randomSixWordAlphabetArrList[2]));
+                alphabet4.setText(String.valueOf(randomSixWordAlphabetArrList[3]));
+                alphabet5.setText(String.valueOf(randomSixWordAlphabetArrList[4]));
+                alphabet6.setText(String.valueOf(randomSixWordAlphabetArrList[5]));
+            }
+        });
+
+        gameViewModel.getGameState().observe(getViewLifecycleOwner(), new Observer<GameViewModel.GameState>() {
+            @Override
+            public void onChanged(GameViewModel.GameState gameState) {
+                if (gameState == GameViewModel.GameState.LOADING) {
+                    hideAll();
+                } else if (gameState == GameViewModel.GameState.PLAYING) {
+                    showAll();
+                    hideSelectedAlphabetButtons();
+                } else if (gameState == GameViewModel.GameState.FINISHED) {
+                    hideAlphabetButtons();
+                    hideInputButtons();
+                    game_bt_retry.setVisibility(View.VISIBLE);
+                } else if (gameState == GameViewModel.GameState.PAUSED) {
+                    hideAll();
+                }
+            }
+        });
     }
 
-    public void showSelectedLetter() {
+    private void showSelectedLetter() {
         String letter = chosenLetterList.get(chosenLetterList.size() - 1);
         switch (chosenLetterList.size()) {
             case 1:
@@ -358,98 +335,88 @@ public class GameFragment extends Fragment {
 
     }
 
-
-    public void countDown(String time) {
-        long conversionTime = 0;
-        String getHour = time.substring(0, 2);
-        String getMin = time.substring(2, 4);
-        String getSecond = time.substring(4, 6);
-
-        if (getHour.substring(0, 1) == "0") {
-            getHour = getHour.substring(1, 2);
-        }
-        if (getMin.substring(0, 1) == "0") {
-            getMin = getMin.substring(1, 2);
-        }
-        if (getSecond.substring(0, 1) == "0") {
-            getSecond = getSecond.substring(1, 2);
-        }
-
-        conversionTime = Long.valueOf(getHour) * 1000 * 3600 + Long.valueOf(getMin) * 60 * 1000 + Long.valueOf(getSecond) * 1000;
-
-        new CountDownTimer(conversionTime, 1000) {
-
-            @Override
-            public void onTick(long millisUntilFinished) {
-                String hour = String.valueOf(millisUntilFinished / (60 * 60 * 1000));
-                long getMin = millisUntilFinished - (millisUntilFinished / (60 * 60 * 1000));
-                String min = String.valueOf(getMin / (60 * 1000));
-                String second = String.valueOf((getMin % (60 * 1000)) / 1000);
-                String millis = String.valueOf((getMin % (60 * 1000)) % 1000);
-
-                if (hour.length() == 1) {
-                    hour = "0" + hour;
-                }
-                if (min.length() == 1) {
-                    min = "0" + min;
-                }
-                if (second.length() == 1) {
-                    second = "0" + second;
-                }
-                game_tv_timer.setText(hour + ":" + min + ":" + second);
-            }
-
-            @Override
-            public void onFinish() {
-                game_tv_timer.setText("finish");
-                alphabet1.setEnabled(false);
-                alphabet2.setEnabled(false);
-                alphabet3.setEnabled(false);
-                alphabet4.setEnabled(false);
-                alphabet5.setEnabled(false);
-                alphabet6.setEnabled(false);
-                game_bt_twist.setEnabled(false);
-                game_bt_clear.setEnabled(false);
-                game_bt_enter.setEnabled(false);
-            }
-        }.start();
+    private void showAll() {
+        game_tv_timer.setVisibility(View.VISIBLE);
+        showAnswers();
+        showInputButtons();
+        showAlphabetButtons();
+        showSelectedAlphabetButtons();
     }
 
-    private void showCorrectAnswers(String userAnswer) {
-        switch (userAnswer.length()) {
-            case 3:
-                String to3Show = "";
-                for (String s : correct3Answers) {
-                    to3Show += s + "\n";
-                }
-                game_tv_correct3Answers.setText(newCountList.get("3")+"/"+maxCountList.get("3")+"\n"+to3Show);
-                break;
-            case 4:
-                String to4Show = "";
-                for (String s : correct4Answers) {
-                    to4Show += s + "\n";
-                }
-                game_tv_correct4Answers.setText(newCountList.get("4")+"/"+maxCountList.get("4")+"\n"+to4Show);
-                break;
-            case 5:
-                String to5Show = "";
-                for (String s : correct5Answers) {
-                    to5Show += s + "\n";
-                }
-                game_tv_correct5Answers.setText(newCountList.get("5")+"/"+maxCountList.get("5")+"\n"+to5Show);
-                break;
-            case 6:
-                String to6Show = "";
-                for (String s : correct6Answers) {
-                    to6Show += s + "\n";
-                }
-                game_tv_correct6Answers.setText(newCountList.get("6")+"/"+maxCountList.get("6")+"\n"+to6Show);
-                break;
-        }
+    private void hideAll() {
+        game_tv_timer.setVisibility(View.INVISIBLE);
+        hideAnswers();
+        hideInputButtons();
+        hideAlphabetButtons();
+        hideSelectedAlphabetButtons();
+    }
+
+    private void hideAnswers() {
+        game_tv_correct3Answers.setVisibility(View.INVISIBLE);
+        game_tv_correct4Answers.setVisibility(View.INVISIBLE);
+        game_tv_correct5Answers.setVisibility(View.INVISIBLE);
+        game_tv_correct6Answers.setVisibility(View.INVISIBLE);
+    }
+
+    private void showAnswers() {
+        game_tv_correct3Answers.setVisibility(View.VISIBLE);
+        game_tv_correct4Answers.setVisibility(View.VISIBLE);
+        game_tv_correct5Answers.setVisibility(View.VISIBLE);
+        game_tv_correct6Answers.setVisibility(View.VISIBLE);
+    }
+
+    private void hideInputButtons() {
+        game_bt_twist.setVisibility(View.INVISIBLE);
+        game_bt_clear.setVisibility(View.INVISIBLE);
+        game_bt_enter.setVisibility(View.INVISIBLE);
+        game_bt_retry.setVisibility(View.INVISIBLE);
+    }
+
+    private void showInputButtons() {
+        game_bt_twist.setVisibility(View.VISIBLE);
+        game_bt_clear.setVisibility(View.VISIBLE);
+        game_bt_enter.setVisibility(View.VISIBLE);
+        game_bt_retry.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSelectedAlphabetButtons() {
+        select_bt_alphabet1.setVisibility(View.INVISIBLE);
+        select_bt_alphabet2.setVisibility(View.INVISIBLE);
+        select_bt_alphabet3.setVisibility(View.INVISIBLE);
+        select_bt_alphabet4.setVisibility(View.INVISIBLE);
+        select_bt_alphabet5.setVisibility(View.INVISIBLE);
+        select_bt_alphabet6.setVisibility(View.INVISIBLE);
+    }
+
+    private void showSelectedAlphabetButtons() {
+        select_bt_alphabet1.setVisibility(View.VISIBLE);
+        select_bt_alphabet2.setVisibility(View.VISIBLE);
+        select_bt_alphabet3.setVisibility(View.VISIBLE);
+        select_bt_alphabet4.setVisibility(View.VISIBLE);
+        select_bt_alphabet5.setVisibility(View.VISIBLE);
+        select_bt_alphabet6.setVisibility(View.VISIBLE);
+    }
+
+    private void hideAlphabetButtons() {
+        alphabet1.setVisibility(View.INVISIBLE);
+        alphabet2.setVisibility(View.INVISIBLE);
+        alphabet3.setVisibility(View.INVISIBLE);
+        alphabet4.setVisibility(View.INVISIBLE);
+        alphabet5.setVisibility(View.INVISIBLE);
+        alphabet6.setVisibility(View.INVISIBLE);
+    }
+
+    private void showAlphabetButtons() {
+        alphabet1.setVisibility(View.VISIBLE);
+        alphabet2.setVisibility(View.VISIBLE);
+        alphabet3.setVisibility(View.VISIBLE);
+        alphabet4.setVisibility(View.VISIBLE);
+        alphabet5.setVisibility(View.VISIBLE);
+        alphabet6.setVisibility(View.VISIBLE);
     }
 
     public void twist() {
-        gameViewModel.shuffle(randomSixWordAlphabetArrList, 6);
+        ShuffleHelper.shuffle(randomSixWordAlphabetArrList);
         for (int i = 0; i < randomSixWordAlphabetArrList.length; i++) {
             char[] twistArrList = new char[randomSixWordAlphabetArrList.length];
             twistArrList[i] = randomSixWordAlphabetArrList[i];
@@ -463,4 +430,48 @@ public class GameFragment extends Fragment {
             alphabet6.setText(String.valueOf(randomSixWordAlphabetArrList[5]));
         }
     }
+    /*gameViewModel.isAnswerLoaded().observe(requireActivity(), new Observer<Boolean>() { //로딩되면
+            @Override
+            public void onChanged(Boolean isLoaded) {
+                if (isLoaded) {
+                    String conversionTime = "000200";
+                    countDown(conversionTime);
+
+                    gameViewModel.loadCountSectionAnswers(selectRandomSixWord); // 3단어,4단어,5단어,6단어 갯수 map만들기
+                    gameViewModel.isCountListLoaded().observe(requireActivity(), new Observer<Boolean>() {
+                        @Override
+                        public void onChanged(Boolean isLoaded) {
+                            if(isLoaded){
+                                newCountList = gameViewModel.countAnswersNumber(selectRandomSixWord);
+                                maxCountList = gameViewModel.countAnswersNumber(selectRandomSixWord);
+
+                                game_tv_correct3Answers.setText(maxCountList.get("3")+"/"+maxCountList.get("3"));
+                                game_tv_correct4Answers.setText(maxCountList.get("4")+"/"+maxCountList.get("4"));
+                                game_tv_correct5Answers.setText(maxCountList.get("5")+"/"+maxCountList.get("5"));
+                                game_tv_correct6Answers.setText(maxCountList.get("6")+"/"+maxCountList.get("6"));
+
+                                Log.d("ASdfasdfasdf", "onChanged: "+newCountList);
+//                            showCorrectAnswers(finalUserAnswer);
+                            }
+                        }
+                    });
+
+
+                    alphabet1.setText(String.valueOf(randomSixWordAlphabetArrList[0]));
+                    alphabet2.setText(String.valueOf(randomSixWordAlphabetArrList[1]));
+                    alphabet3.setText(String.valueOf(randomSixWordAlphabetArrList[2]));
+                    alphabet4.setText(String.valueOf(randomSixWordAlphabetArrList[3]));
+                    alphabet5.setText(String.valueOf(randomSixWordAlphabetArrList[4]));
+                    alphabet6.setText(String.valueOf(randomSixWordAlphabetArrList[5]));
+
+                    select_bt_alphabet1.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet2.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet3.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet4.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet5.setVisibility(View.INVISIBLE);
+                    select_bt_alphabet6.setVisibility(View.INVISIBLE);
+
+                }
+            }
+        });*/
 }

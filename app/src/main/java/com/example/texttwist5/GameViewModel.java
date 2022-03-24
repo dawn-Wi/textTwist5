@@ -1,62 +1,47 @@
 package com.example.texttwist5;
 
-import android.util.Log;
+import android.os.CountDownTimer;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 public class GameViewModel extends ViewModel {
+
     private GameRepository gameRepository = GameRepository.getINSTANCE();
+
     private final MutableLiveData<Boolean> dictionaryLoaded = new MutableLiveData<>(false);
-    private final MutableLiveData<Boolean> answerLoaded = new MutableLiveData<>(false);
-    private final MutableLiveData<Boolean> countListLoaded = new MutableLiveData<>(false);
-    private String randomSelectSixWord;
-    char randomSixWordAlphabetArrList[] = new char[6];
+    private MutableLiveData<GameState> myState = new MutableLiveData<>();
+    private MutableLiveData<String> timerText = new MutableLiveData<>();
+    private MutableLiveData<Boolean> incorrectAnswerSubmitted = new MutableLiveData<Boolean>(false);
+    private MutableLiveData<String> wordsRemainingText3 = new MutableLiveData<String>();
+    private MutableLiveData<String> wordsRemainingText4 = new MutableLiveData<String>();
+    private MutableLiveData<String> wordsRemainingText5 = new MutableLiveData<String>();
+    private MutableLiveData<String> wordsRemainingText6 = new MutableLiveData<String>();
+    private MutableLiveData<String> currDisplayedText = new MutableLiveData<String>();
 
     private List<String> sixWordsList;
     private List<String> allWordsList;
-    private HashSet<String> hashSet;
-    private Map<String,Integer> wordSizeList;
+    private ArrayList<String> correct3Answers = new ArrayList<>();
+    private ArrayList<String> correct4Answers = new ArrayList<>();
+    private ArrayList<String> correct5Answers = new ArrayList<>();
+    private ArrayList<String> correct6Answers = new ArrayList<>();
+    private HashSet<String> answerSet = new HashSet<>();
+    private Map<String, List<String>> answerMap = new HashMap<>();
+    private CountDownTimer countDownTimer;
+    private String selectedWord;
+    private int answerCount3;
+    private int answerCount4;
+    private int answerCount5;
+    private int answerCount6;
 
-    public void setDictionary(InputStream file) {
-        gameRepository.setDictionary(file, result -> {
-            if (result.equals("Success")) {
-                dictionaryLoaded.postValue(true);
-                Log.d("gameViewModel finish", "setDictionary: success");
-            } else {
-                dictionaryLoaded.postValue(false);
-            }
-        });
-    }
-
-    //    public void test(String word){
-//        gameRepository.test(word,result -> {
-//            if (result.equals("Success")) {
-//                Log.d("gameViewModel finish", "test: success");
-//            }
-//        });
-//    }
-    public void checkSixWordMakeList(String word) {
-        gameRepository.checkSixWordMakeList(word, result -> {
-            if (result.equals("Success")) {
-                Log.d("gameViewModel checkSixWordMakeList", "checkSixWordMakeList: Success");
-            } else {
-                Log.d("gameViewModel checkSixWordMakeList", "checkSixWordMakeList: fail");
-            }
-        });
-    }
-
-    public List<String> getAllWordsList() {
-        return allWordsList;
-    }
-
+    //Splash 가 사용 - Dictionary 불러오기
     public void loadData() {
         gameRepository.loadDictionary("all", new GameRepository.GameRepositoryCallback<Result>() {
             @Override
@@ -65,7 +50,6 @@ public class GameViewModel extends ViewModel {
                 if (sixWordsList != null) {
                     dictionaryLoaded.setValue(true);
                 }
-
             }
         });
         gameRepository.loadDictionary("6", new GameRepository.GameRepositoryCallback<Result>() {
@@ -79,106 +63,194 @@ public class GameViewModel extends ViewModel {
         });
     }
 
-    public String selectRandomSixWord() {
-        double randomValue = Math.random();
-        int ran = (int) (randomValue * sixWordsList.size() - 1);
-        randomSelectSixWord = sixWordsList.get(ran);
-        char arr[] = new char[randomSelectSixWord.length()];
-        for (int i = 0; i < randomSelectSixWord.length(); i++) {
-            arr[i] = randomSelectSixWord.charAt(i);
-        }
-        System.out.println(arr);
-        shuffle(arr, 6);
-        for (int i = 0; i < arr.length; i++) {
-            randomSixWordAlphabetArrList[i] = arr[i];
-            System.out.println(randomSixWordAlphabetArrList[i]);
-        }
-        return randomSelectSixWord;
+    public void newGame() {
+        myState.setValue(GameState.LOADING);
+        selectedWord = getRandomSixWord();
+        currDisplayedText.setValue(ShuffleHelper.shuffle(selectedWord));
+        initCountDownTimer();
+        clearData();
+        loadAnswers(selectedWord);
     }
 
-
-    public void shuffle(char[] array, int count) {
-        char temp, temp2;
-        int randomNum1, randomNum2;
-
-        for (int i = 0; i < count; i++) {
-            randomNum1 = (int) (Math.random() * array.length);
-            temp = array[randomNum1];
-            randomNum2 = (int) ((Math.random() * array.length));
-            temp2 = array[randomNum2];
-            array[randomNum1] = temp2;
-            array[randomNum2] = temp;
-        }
+    public void pause()
+    {
+        myState.setValue(GameState.PAUSED);
+        countDownTimer.cancel();
     }
 
-    public void loadAnswers(String word) {
-        gameRepository.loadAnswers(word, new GameRepository.GameRepositoryCallback<Result>() {
-            @Override
-            public void onComplete(Result result) {
-                hashSet = ((Result.Success<HashSet<String>>) result).getData();
-                answerLoaded.setValue(true);
+    public void resume()
+    {
+        myState.setValue(GameState.PLAYING);
+        countDownTimer.start();
+    }
+
+    private void clearData()
+    {
+        correct3Answers.clear();
+        correct4Answers.clear();
+        correct5Answers.clear();
+        correct6Answers.clear();
+        wordsRemainingText3.setValue("");
+        wordsRemainingText4.setValue("");
+        wordsRemainingText5.setValue("");
+        wordsRemainingText6.setValue("");
+        answerSet.clear();
+        answerMap = new HashMap<>();
+    }
+
+    public void checkAnswer(String word) {
+        if (answerSet.contains(word)) {
+            if (word.length() == 3) {
+                correct3Answers.add(word);
+                wordsRemainingText3.setValue((answerCount3 - correct3Answers.size()) + "/" + answerCount3);
+            } else if (word.length() == 4) {
+                correct4Answers.add(word);
+                wordsRemainingText4.setValue((answerCount4 - correct4Answers.size()) + "/" + answerCount4);
+            } else if (word.length() == 5) {
+                correct5Answers.add(word);
+                wordsRemainingText5.setValue((answerCount5 - correct5Answers.size()) + "/" + answerCount5);
+            } else {
+                correct6Answers.add(word);
+                wordsRemainingText6.setValue((answerCount6 - correct6Answers.size()) + "/" + answerCount6);
             }
-        });
-    }
-
-    public void loadCountSectionAnswers(String word){
-        gameRepository.loadCountSectionAnswers(word, new GameRepository.GameRepositoryCallback<Result>() {
-            @Override
-            public void onComplete(Result result) {
-                wordSizeList = ((Result.Success<Map<String, Integer>>)result).getData();
-                countListLoaded.setValue(true);
+            answerSet.remove(word);
+            if(answerSet.size() == 0)
+            {
+                myState.setValue(GameState.FINISHED);
             }
-        });
+        } else {
+            incorrectAnswerSubmitted.setValue(true);
+        }
     }
 
-    public Map<String, Integer> countAnswersNumber(String userAnswer){
-        int word3Value = wordSizeList.get("3");
-        int word4Value=wordSizeList.get("4");
-        int word5Value=wordSizeList.get("5");
-        int word6Value=wordSizeList.get("6");
-        Map<String,Integer> countList = new HashMap<>();
-        if(userAnswer.length()==3){
-            word3Value = wordSizeList.get("3");
-        }
-        else if(userAnswer.length()==4){
-            word4Value = wordSizeList.get("4");
-        }
-        else if(userAnswer.length()==5){
-            word5Value = wordSizeList.get("5");
-        }
-        else if(userAnswer.length()==6){
-            word6Value = wordSizeList.get("6");
-        }
-        countList.put("3",word3Value);
-        countList.put("4",word4Value);
-        countList.put("5",word5Value);
-        countList.put("6",word6Value);
-        return countList;
-    }
-
-    public boolean checkAnswer(String word){
-        return hashSet.contains(word);
-    }
-
-    public List<String> getSixWordsList() {
-        return sixWordsList;
-    }
-
-    public char[] getRandomShuffleSixWord() {
-        return randomSixWordAlphabetArrList;
+    public List<String> getAllWordsList() {
+        return allWordsList;
     }
 
     public LiveData<Boolean> isDictionaryLoaded() {
         return dictionaryLoaded;
     }
 
-    public LiveData<Boolean> isAnswerLoaded(){
-        return answerLoaded;
+    public LiveData<GameState> getGameState() {
+        return myState;
     }
 
-    public LiveData<Boolean> isCountListLoaded(){
-        return countListLoaded;
+    public LiveData<Boolean> isIncorrectAnswerSubmitted() {
+        return incorrectAnswerSubmitted;
     }
 
+    public LiveData<String> getWordsRemainingText3() {
+        return wordsRemainingText3;
+    }
 
+    public LiveData<String> getWordsRemainingText4() {
+        return wordsRemainingText4;
+    }
+
+    public LiveData<String> getWordsRemainingText5() {
+        return wordsRemainingText5;
+    }
+
+    public LiveData<String> getWordsRemainingText6() {
+        return wordsRemainingText6;
+    }
+
+    public LiveData<String> getTimerText()
+    {
+        return timerText;
+    }
+
+    public LiveData<String> getCurrDisplayedText()
+    {
+        return currDisplayedText;
+    }
+
+    public ArrayList<String> getCorrect3Answers() {
+        return correct3Answers;
+    }
+
+    public ArrayList<String> getCorrect4Answers() {
+        return correct4Answers;
+    }
+
+    public ArrayList<String> getCorrect5Answers() {
+        return correct5Answers;
+    }
+
+    public ArrayList<String> getCorrect6Answers() {
+        return correct6Answers;
+    }
+
+    //random으로 6글자 뽑아서 return 하기
+    private String getRandomSixWord() {
+        double randomValue = Math.random();
+        int ran = (int) (randomValue * sixWordsList.size() - 1);
+        return sixWordsList.get(ran);
+    }
+
+    private void initCountDownTimer() {
+        timerText.setValue("00:02:00");
+        if(countDownTimer != null)
+            countDownTimer.cancel();
+        countDownTimer = new CountDownTimer(CountDownTimerHelper.convertStringToLong("000200"), 1000) {
+            @Override
+            public void onTick(long l) {
+                timerText.setValue(CountDownTimerHelper.convertLongToString(l));
+            }
+
+            @Override
+            public void onFinish() {
+                timerText.setValue("Finished");
+                myState.setValue(GameState.FINISHED);
+            }
+        };
+    }
+
+    private void loadAnswers(String word) {
+        gameRepository.loadAnswers(word, new GameRepository.GameRepositoryCallback<Result>() {
+            @Override
+            public void onComplete(Result result) {
+                answerMap = ((Result.Success<Map>) result).getData();
+                for(Map.Entry<String, List<String>> entry : answerMap.entrySet())
+                {
+                    answerSet.addAll(entry.getValue());
+                    if(entry.getKey().equals("3"))
+                        answerCount3 = entry.getValue().size();
+                    else if(entry.getKey().equals("4"))
+                        answerCount4 = entry.getValue().size();
+                    else if(entry.getKey().equals("5"))
+                        answerCount5 = entry.getValue().size();
+                    else if(entry.getKey().equals("6"))
+                        answerCount6 = entry.getValue().size();
+                }
+                myState.setValue(GameState.PLAYING);
+                countDownTimer.start();
+            }
+        });
+    }
+
+    public enum GameState {
+        LOADING,
+        PLAYING,
+        FINISHED,
+        PAUSED
+    }
+
+/*
+6글자 random 뽑고
+답지 loading 하고
+섞고
+
+ */
+
+/*    public void setDictionary(InputStream file) {
+        gameRepository.setDictionary(file, result -> {
+            if (result.equals("Success")) {
+                dictionaryLoaded.postValue(true);
+                Log.d("gameViewModel finish", "setDictionary: success");
+            } else {
+                dictionaryLoaded.postValue(false);
+            }
+        });
+    }*/
 }

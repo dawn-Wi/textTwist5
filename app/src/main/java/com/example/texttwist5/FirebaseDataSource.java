@@ -195,34 +195,26 @@ public class FirebaseDataSource {
                 .get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
-                        HashSet<String> wordSet = new HashSet<>();
+                        HashMap<String, List<String>> wordCount_answerList_map = new HashMap<>();
                         DocumentSnapshot document = task.getResult();
                         if(document.exists()){
                             List<String> list3 = (List<String>) document.getData().get("3");
                             List<String> list4 = (List<String>) document.getData().get("4");
                             List<String> list5 = (List<String>) document.getData().get("5");
                             List<String> list6 = (List<String>) document.getData().get("6");
-                            for(int i=0;i<list3.size();i++){
-                                wordSet.add(list3.get(i));
-                            }
-                            for(int i=0;i<list4.size();i++){
-                                wordSet.add(list4.get(i));
-                            }
-                            for(int i=0;i<list5.size();i++){
-                                wordSet.add(list5.get(i));
-                            }
-                            for(int i=0;i<list6.size();i++){
-                                wordSet.add(list6.get(i));
-                            }
-                            callback.onComplete(new Result.Success<HashSet<String>>(wordSet));
+
+                            wordCount_answerList_map.put("3", list3);
+                            wordCount_answerList_map.put("4", list4);
+                            wordCount_answerList_map.put("5", list5);
+                            wordCount_answerList_map.put("6", list6);
+                            callback.onComplete(new Result.Success<HashMap<String,List<String>>>(wordCount_answerList_map));
                         }else{
                             callback.onComplete(new Result.Error(new Exception()));
                         }
-
                     }
                 });
     }
-
+/*
     public void loadCountSectionAnswers(String word, DataSourceCallback<Result> callback) {
         db.collection("word")
                 .document(word)
@@ -244,7 +236,7 @@ public class FirebaseDataSource {
                         }
                     }
                 });
-    }
+    }*/
 
     public interface DataSourceCallback<T> {
         void onComplete(T result);
