@@ -41,6 +41,7 @@ public class GameFragment extends Fragment {
     Button game_bt_twist;
     Button game_bt_clear;
     Button game_bt_enter;
+    Button game_bt_retry;
     ArrayList<String> chosenLetterList = new ArrayList<>();
     ArrayList<String> correct3Answers = new ArrayList<>();
     ArrayList<String> correct4Answers = new ArrayList<>();
@@ -48,7 +49,8 @@ public class GameFragment extends Fragment {
     ArrayList<String> correct6Answers = new ArrayList<>();
     char randomSixWordAlphabetArrList[];
     Map<String, Integer> newCountList = new HashMap<>();
-    Map<String,Integer> correctAnswerCountMap = new HashMap<>();
+    Map<String, Integer> maxCountList = new HashMap<>();
+
 
 
 
@@ -99,6 +101,7 @@ public class GameFragment extends Fragment {
         game_bt_twist = view.findViewById(R.id.game_bt_twist);
         game_bt_clear = view.findViewById(R.id.game_bt_clear);
         game_bt_enter = view.findViewById(R.id.game_bt_enter);
+        game_bt_retry = view.findViewById(R.id.game_bt_retry);
 
 //        한번만 firestore에 저장하면 되는 코드
 //        try {
@@ -109,9 +112,9 @@ public class GameFragment extends Fragment {
 
 
         String selectRandomSixWord = gameViewModel.selectRandomSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
-        gameViewModel.loadAnswers(selectRandomSixWord);
+        gameViewModel.loadAnswers(selectRandomSixWord); //답지가져오기&없으면 만들기
         randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
-        gameViewModel.loadCountSectionAnswers(selectRandomSixWord); // 3단어,4단어,5단어,6단어 갯수 map만들기
+
 
 
         gameViewModel.isAnswerLoaded().observe(requireActivity(), new Observer<Boolean>() { //로딩되면
@@ -120,6 +123,26 @@ public class GameFragment extends Fragment {
                 if (isLoaded) {
                     String conversionTime = "000200";
                     countDown(conversionTime);
+
+                    gameViewModel.loadCountSectionAnswers(selectRandomSixWord); // 3단어,4단어,5단어,6단어 갯수 map만들기
+                    gameViewModel.isCountListLoaded().observe(requireActivity(), new Observer<Boolean>() {
+                        @Override
+                        public void onChanged(Boolean isLoaded) {
+                            if(isLoaded){
+                                newCountList = gameViewModel.countAnswersNumber(selectRandomSixWord);
+                                maxCountList = gameViewModel.countAnswersNumber(selectRandomSixWord);
+
+                                game_tv_correct3Answers.setText(maxCountList.get("3")+"/"+maxCountList.get("3"));
+                                game_tv_correct4Answers.setText(maxCountList.get("4")+"/"+maxCountList.get("4"));
+                                game_tv_correct5Answers.setText(maxCountList.get("5")+"/"+maxCountList.get("5"));
+                                game_tv_correct6Answers.setText(maxCountList.get("6")+"/"+maxCountList.get("6"));
+
+                                Log.d("ASdfasdfasdf", "onChanged: "+newCountList);
+//                            showCorrectAnswers(finalUserAnswer);
+                            }
+                        }
+                    });
+
 
                     alphabet1.setText(String.valueOf(randomSixWordAlphabetArrList[0]));
                     alphabet2.setText(String.valueOf(randomSixWordAlphabetArrList[1]));
@@ -134,6 +157,7 @@ public class GameFragment extends Fragment {
                     select_bt_alphabet4.setVisibility(View.INVISIBLE);
                     select_bt_alphabet5.setVisibility(View.INVISIBLE);
                     select_bt_alphabet6.setVisibility(View.INVISIBLE);
+
                 }
             }
         });
@@ -202,29 +226,49 @@ public class GameFragment extends Fragment {
                 }
                 Log.d("DEBUG", "onClick: " + userAnswer);
 
+//                String finalUserAnswer = userAnswer;
+//                gameViewModel.isCountListLoaded().observe(requireActivity(), new Observer<Boolean>() {
+//                    @Override
+//                    public void onChanged(Boolean isLoaded) {
+//                        if(isLoaded){
+//                            newCountList = gameViewModel.countAnswersNumber(finalUserAnswer);
+//                            Log.d("ASdfasdfasdf", "onChanged: "+newCountList);
+////                            showCorrectAnswers(finalUserAnswer);
+//                        }
+//                    }
+//                });
+
 
                 if (gameViewModel.checkAnswer(userAnswer)) {
                     //값이 맞았을때
                     if (userAnswer.length() == 3) {
                         correct3Answers.add(userAnswer);
-                        correctAnswerCountMap.put("3",newCountList.get("3")-1);
+                        newCountList.put("3",newCountList.get("3")-1);
+//                        minusValue(userAnswer);
                     } else if (userAnswer.length() == 4) {
                         correct4Answers.add(userAnswer);
-                        correctAnswerCountMap.put("4",newCountList.get("4")-1);
+                        newCountList.put("4",newCountList.get("4")-1);
+//                        minusValue(userAnswer);
+//                        correctAnswerCountMap.put("4",newCountList.get("4")-1);
                     } else if (userAnswer.length() == 5) {
                         correct5Answers.add(userAnswer);
-                        correctAnswerCountMap.put("5",newCountList.get("5")-1);
+                        newCountList.put("5",newCountList.get("5")-1);
+//                        minusValue(userAnswer);
+//                        correctAnswerCountMap.put("5",newCountList.get("5")-1);
                     } else if (userAnswer.length() == 6) {
                         correct6Answers.add(userAnswer);
-                        correctAnswerCountMap.put("6",newCountList.get("6")-1);
+                        newCountList.put("6",newCountList.get("6")-1);
+//                        minusValue(userAnswer);
+//                        correctAnswerCountMap.put("6",newCountList.get("6")-1);
                     }
-//                    showCorrectAnswers(userAnswer);
+                    showCorrectAnswers(userAnswer);
                     Log.d("DEBUG", "onClick: OK");
                 } else {
                     //값이 틀렸을때
                     Toast.makeText(getContext(), "없어바보야", Toast.LENGTH_SHORT).show();
                     Log.d("DEBUG", "onClick: NOT OK");
                 }
+
                 alphabet1.setVisibility(View.VISIBLE);
                 alphabet2.setVisibility(View.VISIBLE);
                 alphabet3.setVisibility(View.VISIBLE);
@@ -239,18 +283,6 @@ public class GameFragment extends Fragment {
                 select_bt_alphabet6.setVisibility(View.INVISIBLE);
                 chosenLetterList.clear();
                 game_bt_twist.setEnabled(true);
-
-                String finalUserAnswer = userAnswer;
-                gameViewModel.isCountListLoaded().observe(requireActivity(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean isLoaded) {
-                        if(isLoaded){
-                            newCountList = gameViewModel.countAnswersNumber(finalUserAnswer);
-                            showCorrectAnswers(finalUserAnswer);
-                        }
-                    }
-                });
-
 
             }
         });
@@ -279,6 +311,17 @@ public class GameFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 twist();
+            }
+        });
+
+        game_bt_retry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String selectRandomSixWord = gameViewModel.selectRandomSixWord(); //6글자 중에 랜덤으로 단어 하나 선택
+                gameViewModel.loadAnswers(selectRandomSixWord); //답지가져오기&없으면 만들기
+                randomSixWordAlphabetArrList = gameViewModel.getRandomShuffleSixWord(); // 선택된 단어 랜덤으로 섞어서 배열에 저장
+                countDown("000000");
             }
         });
 
@@ -314,6 +357,7 @@ public class GameFragment extends Fragment {
         }
 
     }
+
 
     public void countDown(String time) {
         long conversionTime = 0;
@@ -378,28 +422,28 @@ public class GameFragment extends Fragment {
                 for (String s : correct3Answers) {
                     to3Show += s + "\n";
                 }
-                game_tv_correct3Answers.setText("\n"+to3Show);
+                game_tv_correct3Answers.setText(newCountList.get("3")+"/"+maxCountList.get("3")+"\n"+to3Show);
                 break;
             case 4:
                 String to4Show = "";
                 for (String s : correct4Answers) {
                     to4Show += s + "\n";
                 }
-                game_tv_correct4Answers.setText("\n"+to4Show);
+                game_tv_correct4Answers.setText(newCountList.get("4")+"/"+maxCountList.get("4")+"\n"+to4Show);
                 break;
             case 5:
                 String to5Show = "";
                 for (String s : correct5Answers) {
                     to5Show += s + "\n";
                 }
-                game_tv_correct5Answers.setText("\n"+to5Show);
+                game_tv_correct5Answers.setText(newCountList.get("5")+"/"+maxCountList.get("5")+"\n"+to5Show);
                 break;
             case 6:
                 String to6Show = "";
                 for (String s : correct6Answers) {
                     to6Show += s + "\n";
                 }
-                game_tv_correct6Answers.setText("\n"+to6Show);
+                game_tv_correct6Answers.setText(newCountList.get("6")+"/"+maxCountList.get("6")+"\n"+to6Show);
                 break;
         }
     }

@@ -275,6 +275,15 @@
         app:layout_constraintVertical_bias="0.4"
         tools:ignore="MissingConstraints" />
 
+    <Button
+        android:id="@+id/game_bt_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="retry"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/game_bt_clear"
+        tools:ignore="MissingConstraints" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

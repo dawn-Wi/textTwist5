@@ -144,10 +144,10 @@ public class GameViewModel extends ViewModel {
             word4Value = wordSizeList.get("4");
         }
         else if(userAnswer.length()==5){
-            word4Value = wordSizeList.get("5");
+            word5Value = wordSizeList.get("5");
         }
         else if(userAnswer.length()==6){
-            word4Value = wordSizeList.get("6");
+            word6Value = wordSizeList.get("6");
         }
         countList.put("3",word3Value);
         countList.put("4",word4Value);
