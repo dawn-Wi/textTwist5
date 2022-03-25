@@ -294,14 +294,49 @@ public class GameFragment extends Fragment {
                     showAll();
                     hideSelectedAlphabetButtons();
                 } else if (gameState == GameViewModel.GameState.FINISHED) {
+                    hideSelectedAlphabetButtons();
                     hideAlphabetButtons();
                     hideInputButtons();
+                    showAnotherAnswers();
                     game_bt_retry.setVisibility(View.VISIBLE);
                 } else if (gameState == GameViewModel.GameState.PAUSED) {
                     hideAll();
+                    game_bt_pause.setVisibility(View.VISIBLE);
                 }
             }
         });
+    }
+
+    private void showAnotherAnswers() {
+        Map<String, List<String>> anotherAnswerMap = gameViewModel.anotherAnswer();
+        List<String> another3AnswersList = anotherAnswerMap.get("3");
+        List<String> another4AnswersList = anotherAnswerMap.get("4");
+        List<String> another5AnswersList = anotherAnswerMap.get("5");
+        List<String> another6AnswersList = anotherAnswerMap.get("6");
+
+        StringBuilder sb3 = new StringBuilder();
+        for (String str : another3AnswersList) {
+            sb3.append("\n" + str);
+        }
+        game_tv_correct3Answers.append("\n" + "<못 맞춘 답>" + sb3.toString());
+
+        StringBuilder sb4 = new StringBuilder();
+        for (String str : another4AnswersList) {
+            sb4.append("\n" + str);
+        }
+        game_tv_correct4Answers.append("\n" + "<못 맞춘 답>" + sb4.toString());
+
+        StringBuilder sb5 = new StringBuilder();
+        for (String str : another5AnswersList) {
+            sb5.append("\n" + str);
+        }
+        game_tv_correct5Answers.append("\n" + "<못 맞춘 답>" + sb5.toString());
+
+        StringBuilder sb6 = new StringBuilder();
+        for (String str : another6AnswersList) {
+            sb6.append("\n" + str);
+        }
+        game_tv_correct6Answers.append("\n" + "<못 맞춘 답>" + sb6.toString());
     }
 
     private void showSelectedLetter() {
@@ -370,6 +405,7 @@ public class GameFragment extends Fragment {
         game_bt_clear.setVisibility(View.INVISIBLE);
         game_bt_enter.setVisibility(View.INVISIBLE);
         game_bt_retry.setVisibility(View.INVISIBLE);
+        game_bt_pause.setVisibility(View.INVISIBLE);
     }
 
     private void showInputButtons() {
@@ -377,6 +413,7 @@ public class GameFragment extends Fragment {
         game_bt_clear.setVisibility(View.VISIBLE);
         game_bt_enter.setVisibility(View.VISIBLE);
         game_bt_retry.setVisibility(View.VISIBLE);
+        game_bt_pause.setVisibility(View.VISIBLE);
     }
 
     private void hideSelectedAlphabetButtons() {

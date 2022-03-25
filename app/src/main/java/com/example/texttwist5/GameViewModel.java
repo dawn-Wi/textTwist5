@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ public class GameViewModel extends ViewModel {
     private ArrayList<String> correct4Answers = new ArrayList<>();
     private ArrayList<String> correct5Answers = new ArrayList<>();
     private ArrayList<String> correct6Answers = new ArrayList<>();
+    private ArrayList<String> showAnother3Answers = new ArrayList<>();
     private HashSet<String> answerSet = new HashSet<>();
     private Map<String, List<String>> answerMap = new HashMap<>();
     private CountDownTimer countDownTimer = new CountDownTimer(CountDownTimerHelper.convertStringToLong("000200"), 1000) {
@@ -78,26 +80,24 @@ public class GameViewModel extends ViewModel {
     public void newGame() {
         myState.setValue(GameState.LOADING);
         selectedWord = getRandomSixWord();
+        Log.d("GameViewModel selectedWord", "newGame: "+selectedWord);
         currDisplayedText.setValue(ShuffleHelper.shuffle(selectedWord));
         initCountDownTimer();
         clearData();
         loadAnswers(selectedWord);
     }
 
-    public void pause()
-    {
+    public void pause() {
         myState.setValue(GameState.PAUSED);
         countDownTimer.cancel();
     }
 
-    public void resume()
-    {
+    public void resume() {
         myState.setValue(GameState.PLAYING);
         continueTimer();
     }
 
-    private void clearData()
-    {
+    private void clearData() {
         correct3Answers.clear();
         correct4Answers.clear();
         correct5Answers.clear();
@@ -126,13 +126,40 @@ public class GameViewModel extends ViewModel {
                 wordsRemainingText6.setValue((answerCount6 - correct6Answers.size()) + "/" + answerCount6);
             }
             answerSet.remove(word);
-            if(answerSet.size() == 0)
-            {
+            if (answerSet.size() == 0) {
                 myState.setValue(GameState.FINISHED);
             }
         } else {
             incorrectAnswerSubmitted.setValue(true);
         }
+    }
+
+    public Map<String, List<String>> anotherAnswer(){
+        List<String> anotherAnswerList = new ArrayList(answerSet);
+        Map<String, List<String>> anotherAnswerMap = new HashMap<>();
+        List<String> another3Answer = new ArrayList<>();
+        List<String> another4Answer = new ArrayList<>();
+        List<String> another5Answer = new ArrayList<>();
+        List<String> another6Answer = new ArrayList<>();
+        for(int i=0;i<anotherAnswerList.size();i++){
+            if(anotherAnswerList.get(i).length()==3){
+                another3Answer.add(anotherAnswerList.get(i));
+            }
+            else if(anotherAnswerList.get(i).length()==4){
+                another4Answer.add(anotherAnswerList.get(i));
+            }
+            else if(anotherAnswerList.get(i).length()==5){
+                another5Answer.add(anotherAnswerList.get(i));
+            }
+            else if(anotherAnswerList.get(i).length()==6){
+                another6Answer.add(anotherAnswerList.get(i));
+            }
+            anotherAnswerMap.put("3",another3Answer);
+            anotherAnswerMap.put("4",another4Answer);
+            anotherAnswerMap.put("5",another5Answer);
+            anotherAnswerMap.put("6",another6Answer);
+        }
+        return anotherAnswerMap;
     }
 
     public List<String> getAllWordsList() {
@@ -167,13 +194,11 @@ public class GameViewModel extends ViewModel {
         return wordsRemainingText6;
     }
 
-    public LiveData<String> getTimerText()
-    {
+    public LiveData<String> getTimerText() {
         return timerText;
     }
 
-    public LiveData<String> getCurrDisplayedText()
-    {
+    public LiveData<String> getCurrDisplayedText() {
         return currDisplayedText;
     }
 
@@ -202,9 +227,9 @@ public class GameViewModel extends ViewModel {
 
     private void initCountDownTimer() {
         timerText.setValue("00:02:00");
-        if(countDownTimer != null)
+        if (countDownTimer != null)
             countDownTimer.cancel();
-        countDownTimer = new CountDownTimer(CountDownTimerHelper.convertStringToLong("000200"), 1000) {
+        countDownTimer = new CountDownTimer(CountDownTimerHelper.convertStringToLong("000030"), 1000) {
             @Override
             public void onTick(long l) {
                 timerText.setValue(CountDownTimerHelper.convertLongToString(l));
@@ -218,10 +243,10 @@ public class GameViewModel extends ViewModel {
         };
     }
 
-    private void continueTimer(){
-        if(countDownTimer != null){
+    private void continueTimer() {
+        if (countDownTimer != null) {
             countDownTimer.cancel();
-            countDownTimer = new CountDownTimer(CountDownTimerHelper.convertStringToLongContinueTimer(timerText.getValue().toString()),1000) {
+            countDownTimer = new CountDownTimer(CountDownTimerHelper.convertStringToLongContinueTimer(timerText.getValue().toString()), 1000) {
                 @Override
                 public void onTick(long l) {
                     timerText.setValue(CountDownTimerHelper.convertLongToString(l));
@@ -237,8 +262,6 @@ public class GameViewModel extends ViewModel {
         }
 
 
-
-
     }
 
     private void loadAnswers(String word) {
@@ -246,16 +269,15 @@ public class GameViewModel extends ViewModel {
             @Override
             public void onComplete(Result result) {
                 answerMap = ((Result.Success<Map>) result).getData();
-                for(Map.Entry<String, List<String>> entry : answerMap.entrySet())
-                {
+                for (Map.Entry<String, List<String>> entry : answerMap.entrySet()) {
                     answerSet.addAll(entry.getValue());
-                    if(entry.getKey().equals("3"))
+                    if (entry.getKey().equals("3"))
                         answerCount3 = entry.getValue().size();
-                    else if(entry.getKey().equals("4"))
+                    else if (entry.getKey().equals("4"))
                         answerCount4 = entry.getValue().size();
-                    else if(entry.getKey().equals("5"))
+                    else if (entry.getKey().equals("5"))
                         answerCount5 = entry.getValue().size();
-                    else if(entry.getKey().equals("6"))
+                    else if (entry.getKey().equals("6"))
                         answerCount6 = entry.getValue().size();
                 }
                 myState.setValue(GameState.PLAYING);

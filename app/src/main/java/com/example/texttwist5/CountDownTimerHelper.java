@@ -57,7 +57,6 @@ public class CountDownTimerHelper {
             getSecond = getSecond.substring(1, 2);
         }
         conversionTime = Long.valueOf(getHour) * 1000 * 3600 + Long.valueOf(getMin) * 60 * 1000 + Long.valueOf(getSecond) * 1000;
-        Log.d("asdf", "convertStringToLongContinueTimer: "+conversionTime);
         return conversionTime;
     }
 }
