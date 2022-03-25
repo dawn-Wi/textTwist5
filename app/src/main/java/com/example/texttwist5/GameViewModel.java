@@ -1,6 +1,7 @@
 package com.example.texttwist5;
 
 import android.os.CountDownTimer;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -34,7 +35,18 @@ public class GameViewModel extends ViewModel {
     private ArrayList<String> correct6Answers = new ArrayList<>();
     private HashSet<String> answerSet = new HashSet<>();
     private Map<String, List<String>> answerMap = new HashMap<>();
-    private CountDownTimer countDownTimer;
+    private CountDownTimer countDownTimer = new CountDownTimer(CountDownTimerHelper.convertStringToLong("000200"), 1000) {
+        @Override
+        public void onTick(long l) {
+            timerText.setValue(CountDownTimerHelper.convertLongToString(l));
+        }
+
+        @Override
+        public void onFinish() {
+            timerText.setValue("Finished");
+            myState.setValue(GameState.FINISHED);
+        }
+    };
     private String selectedWord;
     private int answerCount3;
     private int answerCount4;
@@ -81,7 +93,7 @@ public class GameViewModel extends ViewModel {
     public void resume()
     {
         myState.setValue(GameState.PLAYING);
-        countDownTimer.start();
+        continueTimer();
     }
 
     private void clearData()
@@ -204,6 +216,29 @@ public class GameViewModel extends ViewModel {
                 myState.setValue(GameState.FINISHED);
             }
         };
+    }
+
+    private void continueTimer(){
+        if(countDownTimer != null){
+            countDownTimer.cancel();
+            countDownTimer = new CountDownTimer(CountDownTimerHelper.convertStringToLongContinueTimer(timerText.getValue().toString()),1000) {
+                @Override
+                public void onTick(long l) {
+                    timerText.setValue(CountDownTimerHelper.convertLongToString(l));
+                }
+
+                @Override
+                public void onFinish() {
+                    timerText.setValue("Finished");
+                    myState.setValue(GameState.FINISHED);
+                }
+            };
+            countDownTimer.start();
+        }
+
+
+
+
     }
 
     private void loadAnswers(String word) {
